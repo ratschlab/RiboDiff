@@ -17,7 +17,7 @@ class ReadInputs(object):
         self.countRibo = np.empty([1, 1], dtype=int)
         self.countRNA = np.empty([1, 1], dtype=int)
 
-    def parseExper(self):
+    def ParseExper(self):
         self.exper = np.loadtxt(self.fileNameExper, dtype=str, delimiter=',', skiprows=1)
 
         # add codes to make it case insensative
@@ -29,7 +29,7 @@ class ReadInputs(object):
         experRNA = self.exper[idxRNA, 0]
         return (experRF, experRNA)
 
-    def readCount(self, experRF, experRNA):
+    def ReadCount(self, experRF, experRNA):
         with open(self.fileNameCount, 'r') as FileIn:
             header = np.array(FileIn.readline().rstrip().split('\t'), dtype=str)
 
@@ -48,6 +48,6 @@ if __name__ == '__main__':
         usage()
     else:
         FileIn = ReadInputs(sys.argv[1], sys.argv[2])
-        experRF, experRNA = FileIn.parseExper()
-        Genes = FileIn.readCount(experRF, experRNA)
+        experRF, experRNA = FileIn.ParseExper()
+        Genes = FileIn.ReadCount(experRF, experRNA)
         print 'Read input files: Done.\n%i Gene(s) to be tested.' % Genes.geneIDs.size
