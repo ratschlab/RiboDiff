@@ -7,6 +7,8 @@ def usage():
 
 def lib_size(countNdarray):
 
+    """ Calculate library size: median( gene[i] cnt / geometric mean[i] across all libraries ) """
+
     # add code to check if there are counts smaller than zero
     #
     
