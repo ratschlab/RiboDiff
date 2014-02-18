@@ -4,7 +4,7 @@ import numpy as np
 def usage():
     sys.stderr.write('Usage:' + '\n' + 'python ReadInputs.py Experiment_Outline_File Gene_Count_File' + '\n')
 
-class ReadInputs(object):
+class readInputs(object):
 
     """ Read the experiment description file, and use it to guide to read gene count file 
         and store all data as a class object containing relative attributes """
@@ -18,6 +18,9 @@ class ReadInputs(object):
         self.countRNA = np.empty([1, 1], dtype=int)
 
     def ParseExper(self):
+
+        """ Read the experiment description file """
+
         self.exper = np.loadtxt(self.fileNameExper, dtype=str, delimiter=',', skiprows=1)
 
         # add codes to make it case insensative
@@ -30,6 +33,9 @@ class ReadInputs(object):
         return (experRF, experRNA)
 
     def ReadCount(self, experRF, experRNA):
+
+        """ Read the discrete reads count file """
+
         with open(self.fileNameCount, 'r') as FileIn:
             header = np.array(FileIn.readline().rstrip().split('\t'), dtype=str)
 
@@ -47,7 +53,8 @@ if __name__ == '__main__':
     if len(sys.argv) < 3:
         usage()
     else:
-        FileIn = ReadInputs(sys.argv[1], sys.argv[2])
+        FileIn = readInputs(sys.argv[1], sys.argv[2])
         experRF, experRNA = FileIn.ParseExper()
-        Genes = FileIn.ReadCount(experRF, experRNA)
-        print 'Read input files: Done.\n%i Gene(s) to be tested.' % Genes.geneIDs.size
+        data = FileIn.ReadCount(experRF, experRNA)
+        print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size
+
