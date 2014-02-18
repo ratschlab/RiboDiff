@@ -4,7 +4,7 @@ import numpy as np
 def usage():
     sys.stderr.write('Usage:' + '\n' + 'python ReadInputs.py Experiment_Outline_File Gene_Count_File' + '\n')
 
-class readInputs(object):
+class ReadInputs(object):
 
     """ Read the experiment description file, and use it to guide to read gene count file 
         and store all data as a class object containing relative attributes """
@@ -13,11 +13,15 @@ class readInputs(object):
         self.fileNameExper = fileName1
         self.fileNameCount = fileName2
         self.exper = np.empty([1, 1], dtype=str)
+        self.experRF = np.empty([1, 1], dtype=str)
+        self.experRNA = np.empty([1, 1], dtype=str)
         self.geneIDs = np.empty([1, 1], dtype=str)
         self.countRibo = np.empty([1, 1], dtype=int)
         self.countRNA = np.empty([1, 1], dtype=int)
+        self.libSizesRibo = np.empty([1, 1], dtype=float)
+        self.libSizesRNA = np.empty([1, 1], dtype=float)
 
-    def ParseExper(self):
+    def parse_exper(self):
 
         """ Read the experiment description file """
 
@@ -28,11 +32,11 @@ class readInputs(object):
         idxRNA = self.exper[:, 1] != 'Ribosome_Footprint'
         #
 
-        experRF = self.exper[idxRF, 0]
-        experRNA = self.exper[idxRNA, 0]
-        return (experRF, experRNA)
+        self.experRF = self.exper[idxRF, 0]
+        self.experRNA = self.exper[idxRNA, 0]
+        return self
 
-    def ReadCount(self, experRF, experRNA):
+    def read_count(self):
 
         """ Read the discrete reads count file """
 
@@ -40,8 +44,8 @@ class readInputs(object):
             header = np.array(FileIn.readline().rstrip().split('\t'), dtype=str)
 
         # add codes to dectect if the column name in the header of the count file agree with that in Experiment Outline File 
-        idxRF = np.in1d(header, experRF).nonzero()[0]
-        idxRNA = np.in1d(header, experRNA).nonzero()[0]
+        idxRF = np.in1d(header, self.experRF).nonzero()[0]
+        idxRNA = np.in1d(header, self.experRNA).nonzero()[0]
         #
 
         self.geneIDs = np.loadtxt(self.fileNameCount, dtype=str, skiprows=1, usecols=(0,))
@@ -53,8 +57,9 @@ if __name__ == '__main__':
     if len(sys.argv) < 3:
         usage()
     else:
-        FileIn = readInputs(sys.argv[1], sys.argv[2])
-        experRF, experRNA = FileIn.ParseExper()
-        data = FileIn.ReadCount(experRF, experRNA)
+        print '*'*25
+        FileIn = ReadInputs(sys.argv[1], sys.argv[2])
+        data = FileIn.parse_exper()
+        data = FileIn.read_count()
         print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size
 
