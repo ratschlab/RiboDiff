@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-import input_data as id
+import loadinput as ld
 import normalize as nm
 
 def usage():
@@ -11,7 +11,7 @@ if __name__ == '__main__':
         usage()
     else:
         print '*'*25
-        FileIn = id.ReadInputs(sys.argv[1], sys.argv[2])
+        FileIn = ld.LoadInputs(sys.argv[1], sys.argv[2])
         data = FileIn.parse_exper()
         data = FileIn.read_count()
         print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size

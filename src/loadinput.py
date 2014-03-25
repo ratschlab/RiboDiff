@@ -2,9 +2,10 @@ import sys
 import numpy as np
 
 def usage():
+
     sys.stderr.write('Usage:' + '\n' + 'python ReadInputs.py Experiment_Outline_File Gene_Count_File' + '\n')
 
-class ReadInputs(object):
+class LoadInputs(object):
 
     """ Read the experiment description file, and use it to guide to read gene count file 
         and store all data as a class object containing relative attributes """
@@ -29,7 +30,7 @@ class ReadInputs(object):
 
         # add codes to make it case insensative
         idxRF = self.exper[:, 1] == 'Ribosome_Footprint'
-        idxRNA = self.exper[:, 1] != 'Ribosome_Footprint'
+        idxRNA = self.exper[:, 1] == 'RNA_seq'
         #
 
         self.experRF = self.exper[idxRF, 0]
@@ -58,8 +59,7 @@ if __name__ == '__main__':
         usage()
     else:
         print '*'*25
-        FileIn = ReadInputs(sys.argv[1], sys.argv[2])
+        FileIn = LoadInputs(sys.argv[1], sys.argv[2])
         data = FileIn.parse_exper()
         data = FileIn.read_count()
         print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size
-
