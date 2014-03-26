@@ -11,7 +11,7 @@ def lib_size(countNdarray):
 
     # add code to check if there are counts smaller than zero
     #
-    
+
     countNdarrayTmp = countNdarray.copy()
     countNdarrayTmp[countNdarrayTmp==0] = 1    #### or countNdarrayTmp = countNdarrayTmp + 1 ###
     geoMeans = np.exp(np.mean(np.log(countNdarrayTmp), axis=1))

@@ -13,6 +13,7 @@ class LoadInputs(object):
     def __init__(self, fileName1, fileName2):
         self.fileNameExper = fileName1
         self.fileNameCount = fileName2
+        self.experiment = np.empty([1, 1], dtype=str)
         self.exper = np.empty([1, 1], dtype=str)
         self.experRF = np.empty([1, 1], dtype=str)
         self.experRNA = np.empty([1, 1], dtype=str)
@@ -26,12 +27,20 @@ class LoadInputs(object):
 
         """ Read the experiment description file """
 
-        self.exper = np.loadtxt(self.fileNameExper, dtype=str, delimiter=',', skiprows=1)
+        self.experiment = np.loadtxt(self.fileNameExper, dtype=str, delimiter=',', skiprows=1)
+        self.exper = self.experiment.copy()
 
         # add codes to make it case insensative
         idxRF = self.exper[:, 1] == 'Ribosome_Footprint'
         idxRNA = self.exper[:, 1] == 'RNA_seq'
-        #
+        idxCtrl = self.exper[:, 1] == 'Control'
+        idxTrt = self.exper[:, 1] == 'Treated'
+
+        self.exper[idxRF, 1] = 'Ribo'
+        self.exper[idxRNA, 1] = 'Rna'
+        self.exper[idxCtrl, 2] = 'Control'
+        self.exper[idxTrt, 2] = 'Treated'
+        # 
 
         self.experRF = self.exper[idxRF, 0]
         self.experRNA = self.exper[idxRNA, 0]
