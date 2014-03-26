@@ -47,16 +47,17 @@ def create_matrix_1(experNdarray, model='H0'):
 
 def estimate_disp(data):
 
-    #explanatory = create_matrix_0(data.exper)
-    explanatory = create_matrix_1(data.exper, model='H0')
+    #explanatory = create_matrix_0(data.exper, model='H1')
+    explanatory = create_matrix_1(data.exper, model='H1')
     #explanatory = sm.add_constant(explanatory, prepend=False)
 
     num = len(data.geneIDs)
-#	for i in range(num):
+#   for i in range(num):
     i = 0
     response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
+    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
     disper = 0.1
-    modNB = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper))
+    modNB = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
     #modNB = sm.NegativeBinomial(response, explanatory, loglike_method='nb2')
     results = modNB.fit()
     print results.summary()
@@ -74,7 +75,7 @@ if __name__ == '__main__':
         data.libSizesRibo = nm.lib_size(data.countRibo)
         data.libSizesRNA = nm.lib_size(data.countRNA)
         print 'Library size:'
-        np.set_printoptions(precision=3)
+        #np.set_printoptions(precision=3)
         print data.experRF
         print data.libSizesRibo
         print data.experRNA
