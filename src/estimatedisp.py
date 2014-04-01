@@ -13,9 +13,10 @@ def estimate_disp(data, method='simp'):
     #explanatory = cm.create_matrix_0(data.exper, model='H1')
     explanatory = cm.create_matrix_1(data.exper, model='H1')
     #explanatory = sm.add_constant(explanatory, prepend=False)
+    data.matrix = explanatory
 
     if method == 'simp':
-        dp.disper_simp(data, explanatory)
+        dp.disper_simp(data)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
