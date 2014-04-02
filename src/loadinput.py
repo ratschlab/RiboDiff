@@ -23,6 +23,7 @@ class LoadInputs(object):
         self.libSizesRibo = np.empty([1, 1], dtype=float)
         self.libSizesRNA = np.empty([1, 1], dtype=float)
         self.matrix = np.empty([1, 1], dtype=int)
+        self.disperRaw = np.empty([1, 1], dtype=float)
 
     def parse_exper(self):
 
