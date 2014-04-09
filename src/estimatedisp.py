@@ -11,7 +11,8 @@ def usage():
 def estimate_disp(data, method='simp'):
 
     #explanatory = cm.create_matrix_0(data.exper, model='H1')
-    explanatory = cm.create_matrix_1(data.exper, model='H1')
+    #explanatory = cm.create_matrix_1(data.exper, model='H1')
+    explanatory = cm.create_matrix_2(data.exper, model='H1')
     #explanatory = sm.add_constant(explanatory, prepend=False)
     data.matrix = explanatory
 

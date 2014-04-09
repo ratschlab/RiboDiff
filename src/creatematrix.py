@@ -12,9 +12,10 @@ def create_matrix_0(experNdarray, model='H0'):
         explanatory = np.zeros((width, 3))
         explanatory[:, 0] = 1
         explanatory[experNdarray[:,1]=='Ribo', 1] = 1
-        explanatory[np.logical_and(experNdarray[:,1]=='Ribo', experNdarray[:,2]=='Treated'), 1] = 1
+        explanatory[np.logical_and(experNdarray[:,1]=='Ribo', experNdarray[:,2]=='Treated'), 2] = 1
     else:
         sys.stderr.write('ERROR: The parameter \'model\' in create_sparse() can only accept \'H0\' or \'H1\' as its input.\n')
+
     return explanatory
 
 def create_matrix_1(experNdarray, model='H0'):
@@ -38,3 +39,21 @@ def create_matrix_1(experNdarray, model='H0'):
 
     return explanatory
 
+def create_matrix_2(experNdarray, model='H0'):
+
+    width = len(experNdarray[:, 0])
+    if model == 'H0':
+        explanatory = np.zeros((width, 3))
+        explanatory[experNdarray[:,2]=='Control', 0] = 1
+        explanatory[experNdarray[:,2]=='Treated', 1] = 1
+        explanatory[experNdarray[:,1]=='Rna', 2] = 1
+    elif model == 'H1':
+        explanatory = np.zeros((width, 4))
+        explanatory[experNdarray[:,2]=='Control', 0] = 1
+        explanatory[experNdarray[:,2]=='Treated', 1] = 1
+        explanatory[experNdarray[:,1]=='Rna', 2] = 1
+        explanatory[np.logical_and(experNdarray[:,1]=='Ribo', experNdarray[:,2]=='Treated'), 3] = 1
+    else:
+        sys.stderr.write('ERROR: The parameter \'model\' in create_sparse() can only accept \'H0\' or \'H1\' as its input.\n')
+
+    return explanatory    
