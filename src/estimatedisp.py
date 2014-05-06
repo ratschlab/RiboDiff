@@ -17,7 +17,8 @@ def estimate_disp(data, method='simp'):
     data.matrix = explanatory
 
     if method == 'simp':
-        dp.disper_simp(data)
+        data = dp.disper_simp(data)
+        data = dp.fit_disper_gamma(data)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -39,3 +40,5 @@ if __name__ == '__main__':
         print data.libSizesRNA
         print '*'*25
         data = estimate_disp(data, method='simp')
+        print 'Estimate dispersion: Done.'
+        print '*'*25

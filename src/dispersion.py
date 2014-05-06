@@ -35,6 +35,7 @@ def disper_simp(data):
             #modNB = sm.NegativeBinomial(response, explanatory, loglike_method='nb2')
             result = modNB.fit()
             #print result.summary()
+            #print result.mu
             disperBef = disper
             yhat = result.mu
             sign = -1.0
@@ -45,5 +46,42 @@ def disper_simp(data):
         disperRaw[i] = disper
 
     data.disperRaw = disperRaw
+
+    return data
+
+def fit_disper_gamma(data):
+
+    countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
+    disper = data.disperRaw
+    disper = disper.flatten()
+    beta = np.array([0.1, 1])
+
+    iter = 10
+    for i in range(iter):
+        ratio = disper / (beta[0] + beta[1]/countRiboMean)
+        idx = np.logical_and(ratio>1e-3, ratio<10)
+
+        matrix = np.empty((len(np.nonzero(idx)[0]), 2))
+        matrix.fill(np.nan)
+        matrix[:, 0] = 1
+        matrix[:, 1] = 1 / countRiboMean[idx]
+
+        modGamma = sm.GLM(disper[idx], matrix, family=sm.families.Gamma(sm.families.links.identity))
+        result = modGamma.fit(start_params=beta)
+
+        #print result.summary()
+        #print result.params
+
+        betaBef = beta
+        beta = result.params
+
+        if sum(np.log(beta / betaBef)**2) < 0.001:
+            break
+
+        if i == iter - 1:
+            print 'Fitting dispersion does not converge.'
+
+    disperFitted = beta[0] / countRiboMean + beta[1]
+    data.disperFitted = np.reshape(disperFitted, (len(disperFitted), 1))
 
     return data

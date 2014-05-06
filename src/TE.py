@@ -24,3 +24,5 @@ if __name__ == '__main__':
         print data.libSizesRibo
         print data.experRNA
         print data.libSizesRNA
+        print 'Estimate dispersion: Done.'
+        print '*'*25
