@@ -3,7 +3,7 @@ import numpy as np
 
 def usage():
 
-    sys.stderr.write('Usage:' + '\n' + 'python ReadInputs.py Experiment_Outline_File Gene_Count_File' + '\n')
+    sys.stderr.write('Usage:' + '\n' + 'python loadinput.py Experiment_Outline_File Gene_Count_File' + '\n')
 
 class LoadInputs(object):
 
@@ -25,6 +25,7 @@ class LoadInputs(object):
         self.matrix = np.empty([1, 1], dtype=int)
         self.disperRaw = np.empty([1, 1], dtype=float)
         self.disperFitted = np.empty([1, 1], dtype=float)
+        self.pval = np.empty([1, 1], dtype=float)
 
     def parse_exper(self):
 
@@ -61,7 +62,8 @@ class LoadInputs(object):
         idxRNA = np.in1d(header, self.experRNA).nonzero()[0]
         #
 
-        self.geneIDs = np.loadtxt(self.fileNameCount, dtype=str, skiprows=1, usecols=(0,))
+        geneIDs = np.loadtxt(self.fileNameCount, dtype=str, skiprows=1, usecols=(0,))
+        self.geneIDs = geneIDs.reshape(len(geneIDs), 1)
         self.countRibo = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRF)
         self.countRNA = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRNA)
         return self

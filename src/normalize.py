@@ -3,7 +3,7 @@ import numpy as np
 import loadinput as ld
 
 def usage():
-    sys.stderr.write('Usage:' + '\n' + 'python ReadInputs.py Experiment_Outline_File Gene_Count_File' + '\n')
+    sys.stderr.write('Usage:' + '\n' + 'python normalize.py Experiment_Outline_File Gene_Count_File' + '\n')
 
 def lib_size(countNdarray):
 

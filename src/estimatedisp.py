@@ -6,7 +6,7 @@ import dispersion as dp
 
 def usage():
 
-    sys.stderr.write('Usage:' + '\n' + 'python ReadInputs.py Experiment_Outline_File Gene_Count_File' + '\n')
+    sys.stderr.write('Usage:' + '\n' + 'python estimatedisp.py Experiment_Outline_File Gene_Count_File' + '\n')
 
 def estimate_disp(data, method='simp'):
 
@@ -19,6 +19,8 @@ def estimate_disp(data, method='simp'):
     if method == 'simp':
         data = dp.disper_simp(data)
         data = dp.fit_disper_gamma(data)
+
+    return data
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
