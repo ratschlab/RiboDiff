@@ -24,11 +24,12 @@ def test_count(data):
     for i in range(num):
         response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
         disper = data.disperFitted[i]
-        modNB0 = sm.GLM(response, explanatory0, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
-        modNB1 = sm.GLM(response, explanatory1, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
-        result0 = modNB0.fit()
-        result1 = modNB1.fit()
-        pval[i] = 1 - chi2.cdf(result0.deviance - result1.deviance, explanatory1.shape[1] - explanatory0.shape[1])
+        if not np.isnan(disper):
+            modNB0 = sm.GLM(response, explanatory0, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+            modNB1 = sm.GLM(response, explanatory1, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+            result0 = modNB0.fit()
+            result1 = modNB1.fit()
+            pval[i] = 1 - chi2.cdf(result0.deviance - result1.deviance, explanatory1.shape[1] - explanatory0.shape[1])
 
     data.pval = pval
 
