@@ -2,7 +2,8 @@ import sys
 import loadinput as ld
 import normalize as nm
 import creatematrix as cm
-import dispersion as dp
+import rawdispersion as rd
+import fitdispersion as fd
 
 def usage():
 
@@ -17,8 +18,8 @@ def estimate_disp(data, method='simp'):
     data.matrix = explanatory
 
     if method == 'simp':
-        data = dp.disper_simp(data)
-        data = dp.fit_disper_gamma(data)
+        data = rd.disper_raw(data)
+        data = fd.disper_fit(data)
 
     return data
 

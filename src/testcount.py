@@ -13,6 +13,8 @@ def usage():
 
 def test_count(data):
 
+    print 'Start the statistical test.'
+
     num = len(data.geneIDs)
     pval = np.empty((num, 1))
     pval.fill(np.nan)
@@ -22,6 +24,12 @@ def test_count(data):
     librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
 
     for i in range(num):
+
+        if i % 50 == 0:
+            print '%i genes finished...' % i
+        if i+1 == num:
+            print '%i genes finished...' % num
+
         response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
         disper = data.disperFitted[i]
         if not np.isnan(disper):

@@ -48,6 +48,7 @@ class LoadInputs(object):
 
         self.experRF = self.exper[idxRF, 0]
         self.experRNA = self.exper[idxRNA, 0]
+
         return self
 
     def read_count(self):
@@ -66,6 +67,7 @@ class LoadInputs(object):
         self.geneIDs = geneIDs.reshape(len(geneIDs), 1)
         self.countRibo = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRF)
         self.countRNA = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRNA)
+
         return self
 
 if __name__ == '__main__':
