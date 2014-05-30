@@ -39,5 +39,7 @@ def disper_fit(data):
     disperFitted[index] = beta[0] / countRiboMean[index] + beta[1]
     data.disperFitted = disperFitted
 
+    print 'Fit dispersion: Done.'
+
     return data
 

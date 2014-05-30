@@ -31,7 +31,7 @@ def test_count(data):
             print '%i genes finished...' % num
 
         response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
-        disper = data.disperFitted[i]
+        disper = data.disperAdj[i]
         if not np.isnan(disper):
             modNB0 = sm.GLM(response, explanatory0, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
             modNB1 = sm.GLM(response, explanatory1, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
@@ -48,8 +48,9 @@ def write_output(data, fileName):
     geneIDs = data.geneIDs
     disperRaw = data.disperRaw.astype(str)
     disperFitted = data.disperFitted.astype(str)
+    disperAdj = data.disperAdj.astype(str)
     pval = data.pval.astype(str)
-    outNdarray = np.hstack([geneIDs, disperRaw, disperFitted, pval])
+    outNdarray = np.hstack([geneIDs, disperRaw, disperFitted, disperAdj, pval])
     np.savetxt(fileName, outNdarray, fmt='%s', delimiter='\t')
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import normalize as nm
 import creatematrix as cm
 import rawdispersion as rd
 import fitdispersion as fd
+import adjdispersion as ad
 
 def usage():
 
@@ -20,6 +21,7 @@ def estimate_disp(data, method='simp'):
     if method == 'simp':
         data = rd.disper_raw(data)
         data = fd.disper_fit(data)
+        data = ad.disper_adj(data)
 
     return data
 
