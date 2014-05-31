@@ -17,6 +17,12 @@ class LoadInputs(object):
         self.exper = np.empty([1, 1], dtype=str)
         self.experRF = np.empty([1, 1], dtype=str)
         self.experRNA = np.empty([1, 1], dtype=str)
+        self.experCtl = np.empty([1, 1], dtype=str)
+        self.experTrt = np.empty([1, 1], dtype=str)
+        self.idxRF = np.empty([1, 1], dtype=int)
+        self.idxRNA = np.empty([1, 1], dtype=int)
+        self.idxCtl = np.empty([1, 1], dtype=int)
+        self.idxTrt = np.empty([1, 1], dtype=int)
         self.geneIDs = np.empty([1, 1], dtype=str)
         self.countRibo = np.empty([1, 1], dtype=int)
         self.countRNA = np.empty([1, 1], dtype=int)
@@ -27,6 +33,7 @@ class LoadInputs(object):
         self.disperFitted = np.empty([1, 1], dtype=float)
         self.disperAdj = np.empty([1, 1], dtype=float)
         self.pval = np.empty([1, 1], dtype=float)
+        self.logFoldChange = np.empty([1, 1], dtype=float)
 
     def parse_exper(self):
 
@@ -36,19 +43,21 @@ class LoadInputs(object):
         self.exper = self.experiment.copy()
 
         # add codes to make it case insensative
-        idxRF = self.exper[:, 1] == 'Ribosome_Footprint'
+        idxRF  = self.exper[:, 1] == 'Ribosome_Footprint'
         idxRNA = self.exper[:, 1] == 'RNA_seq'
-        idxCtrl = self.exper[:, 1] == 'Control'
-        idxTrt = self.exper[:, 1] == 'Treated'
+        idxCtl = self.exper[:, 2] == 'Control'
+        idxTrt = self.exper[:, 2] == 'Treated'
 
-        self.exper[idxRF, 1] = 'Ribo'
+        self.exper[idxRF,  1] = 'Ribo'
         self.exper[idxRNA, 1] = 'Rna'
-        self.exper[idxCtrl, 2] = 'Control'
+        self.exper[idxCtl, 2] = 'Control'
         self.exper[idxTrt, 2] = 'Treated'
         # 
 
-        self.experRF = self.exper[idxRF, 0]
+        self.experRF  = self.exper[idxRF,  0]
         self.experRNA = self.exper[idxRNA, 0]
+        self.experCtl = self.exper[idxCtl, 0]
+        self.experTrt = self.exper[idxTrt, 0]
 
         return self
 
@@ -60,14 +69,16 @@ class LoadInputs(object):
             header = np.array(FileIn.readline().rstrip().split('\t'), dtype=str)
 
         # add codes to dectect if the column name in the header of the count file agree with that in Experiment Outline File 
-        idxRF = np.in1d(header, self.experRF).nonzero()[0]
-        idxRNA = np.in1d(header, self.experRNA).nonzero()[0]
+        self.idxRF  = np.in1d(header, self.experRF ).nonzero()[0]
+        self.idxRNA = np.in1d(header, self.experRNA).nonzero()[0]
+        self.idxCtl = np.in1d(header, self.experCtl).nonzero()[0]
+        self.idxTrt = np.in1d(header, self.experTrt).nonzero()[0]
         #
 
         geneIDs = np.loadtxt(self.fileNameCount, dtype=str, skiprows=1, usecols=(0,))
         self.geneIDs = geneIDs.reshape(len(geneIDs), 1)
-        self.countRibo = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRF)
-        self.countRNA = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRNA)
+        self.countRibo = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=self.idxRF)
+        self.countRNA = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=self.idxRNA)
 
         return self
 

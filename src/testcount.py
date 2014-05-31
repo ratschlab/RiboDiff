@@ -43,6 +43,28 @@ def test_count(data):
 
     return data
 
+def cal_TEchange(data):
+
+    const = 1e-5
+
+    count = np.hstack([data.countRibo, data.countRNA])
+    libSizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
+
+    idxRFCtl  = np.intersect1d(data.idxRF,  data.idxCtl) - 1
+    idxRNACtl = np.intersect1d(data.idxRNA, data.idxCtl) - 1
+    TEctl = (const + np.mean((count/libSizes)[:, idxRFCtl], axis=1)) / (const + np.mean((count/libSizes)[:, idxRNACtl], axis=1))
+
+    idxRFTrt  = np.intersect1d(data.idxRF,  data.idxTrt) - 1
+    idxRNATrt = np.intersect1d(data.idxRNA, data.idxTrt) - 1
+    TEtrt = (const + np.mean((count/libSizes)[:, idxRFTrt], axis=1)) / (const + np.mean((count/libSizes)[:, idxRNATrt], axis=1))
+
+    logFoldChange = np.log2(TEtrt) - np.log2(TEctl)
+    logFoldChange = np.reshape(logFoldChange, (len(logFoldChange), 1))
+
+    data.logFoldChange = logFoldChange
+
+    return data
+
 def write_output(data, fileName):
 
     geneIDs = data.geneIDs
@@ -50,7 +72,8 @@ def write_output(data, fileName):
     disperFitted = data.disperFitted.astype(str)
     disperAdj = data.disperAdj.astype(str)
     pval = data.pval.astype(str)
-    outNdarray = np.hstack([geneIDs, disperRaw, disperFitted, disperAdj, pval])
+    logFoldChange = data.logFoldChange
+    outNdarray = np.hstack([geneIDs, disperRaw, disperFitted, disperAdj, pval, logFoldChange])
     np.savetxt(fileName, outNdarray, fmt='%s', delimiter='\t')
 
 if __name__ == '__main__':
@@ -77,6 +100,9 @@ if __name__ == '__main__':
         print '*'*25
         data = test_count(data)
         print 'Statistical test: Done.'
+        print '*'*25
+        data = cal_TEchange(data)
+        print 'Calculate TE fold change: Done.'
         print '*'*25
         write_output(data, sys.argv[3])
         print 'Write output file: Done.'
