@@ -83,7 +83,7 @@ class LoadInputs(object):
         return self
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
+    if len(sys.argv) != 3:
         usage()
     else:
         print '*'*25

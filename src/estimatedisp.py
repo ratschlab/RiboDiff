@@ -26,7 +26,7 @@ def estimate_disp(data, method='simp'):
     return data
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
+    if len(sys.argv) != 3:
         usage()
     else:
         print '*'*25
