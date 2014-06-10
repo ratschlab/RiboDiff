@@ -6,6 +6,8 @@ import numpy as np
 import creatematrix as cm
 import statsmodels.api as sm
 from scipy.stats import chi2
+import statsmodels.sandbox as sms
+import cPickle as pickle
 
 def usage():
 
@@ -43,6 +45,36 @@ def test_count(data):
 
     return data
 
+def adj_pval(data, mthd='BH'):
+
+    pval = data.pval.copy()
+    idx = ~np.isnan(pval)
+
+    if mthd == 'BH':
+        method = 'fdr_bh'
+    elif mthd == 'Bonferroni':
+        method = 'bonferroni'
+    elif mthd == 'Holm':
+        method = 'holm'
+    elif mthd == 'Hochberg':
+        method = 'simes-hochberg'
+    elif mthd == 'Hommel':
+        method = 'hommel'
+    elif mthd == 'BY':
+        method = 'fdr_by'
+    elif mthd == 'TSBH':
+        method = 'tsbh'
+    else:
+        sys.stderr.write('ERROR: The methods for multiple test correction can only accept \'Bonferroni\', \'Holm\', \'Hochberg\', \'Hommel\', \'BH\', \'BY\' or \'TSBH\' as its input.\n')
+
+    mtc = sms.stats.multicomp.multipletests(pval[idx], alpha=0.05, method=method, returnsorted=False)
+
+    padj = pval.copy()
+    padj[idx] = mtc[1]
+    data.padj = padj
+
+    return data
+
 def cal_TEchange(data):
 
     const = 1e-5
@@ -72,9 +104,11 @@ def write_output(data, fileName):
     disperFitted = data.disperFitted.astype(str)
     disperAdj = data.disperAdj.astype(str)
     pval = data.pval.astype(str)
+    padj = data.padj.astype(str)
     logFoldChange = data.logFoldChange
-    outNdarray = np.hstack([geneIDs, disperRaw, disperFitted, disperAdj, pval, logFoldChange])
-    np.savetxt(fileName, outNdarray, fmt='%s', delimiter='\t')
+    outNdarray = np.hstack([geneIDs, disperRaw, disperFitted, disperAdj, pval, padj, logFoldChange])
+    header = "geneIDs\tdisperRaw\tdisperFitted\tdisperAdj\tpval\tpadj\tlogFoldChange"
+    np.savetxt(fileName, outNdarray, fmt='%s', delimiter='\t', header=header, comments='')
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
@@ -95,10 +129,11 @@ if __name__ == '__main__':
         print data.experRNA
         print data.libSizesRNA
         print '*'*25
-        data = ed.estimate_disp(data, method='simp')
+        data = ed.estimate_disp(data, mthd='simp')
         print 'Estimate dispersion: Done.'
         print '*'*25
         data = test_count(data)
+        data = adj_pval(data, mthd='BH')
         print 'Statistical test: Done.'
         print '*'*25
         data = cal_TEchange(data)
@@ -106,4 +141,11 @@ if __name__ == '__main__':
         print '*'*25
         write_output(data, sys.argv[3])
         print 'Write output file: Done.'
+        print '*'*25
+        pos = sys.argv[3].rfind('/') + 1
+        pathOutput = sys.argv[3][:pos]
+        pklFile = pathOutput + 'data.pkl'
+        with open(pklFile, 'wb') as FileOut:
+            pickle.dump(data, FileOut)
+        print 'Save data: Done.'
         print '*'*25

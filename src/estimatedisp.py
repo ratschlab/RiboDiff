@@ -10,7 +10,7 @@ def usage():
 
     sys.stderr.write('Usage:' + '\n' + 'python estimatedisp.py Experiment_Outline_File Gene_Count_File' + '\n')
 
-def estimate_disp(data, method='simp'):
+def estimate_disp(data, mthd='simp'):
 
     #explanatory = cm.create_matrix_0(data.exper, model='H1')
     #explanatory = cm.create_matrix_1(data.exper, model='H1')
@@ -18,7 +18,7 @@ def estimate_disp(data, method='simp'):
     #explanatory = sm.add_constant(explanatory, prepend=False)
     data.matrix = explanatory
 
-    if method == 'simp':
+    if mthd == 'simp':
         data = rd.disper_raw(data)
         data = fd.disper_fit(data)
         data = ad.disper_adj(data)
@@ -44,6 +44,6 @@ if __name__ == '__main__':
         print data.experRNA
         print data.libSizesRNA
         print '*'*25
-        data = estimate_disp(data, method='simp')
+        data = estimate_disp(data, mthd='simp')
         print 'Estimate dispersion: Done.'
         print '*'*25

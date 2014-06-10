@@ -31,8 +31,10 @@ class LoadInputs(object):
         self.matrix = np.empty([1, 1], dtype=int)
         self.disperRaw = np.empty([1, 1], dtype=float)
         self.disperFitted = np.empty([1, 1], dtype=float)
+        self.beta = np.empty([1, 1], dtype=float)
         self.disperAdj = np.empty([1, 1], dtype=float)
         self.pval = np.empty([1, 1], dtype=float)
+        self.padj = np.empty([1, 1], dtype=float)
         self.logFoldChange = np.empty([1, 1], dtype=float)
 
     def parse_exper(self):

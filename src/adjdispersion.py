@@ -3,7 +3,6 @@ import statsmodels.api as sm
 from scipy.optimize import minimize_scalar
 from scipy.special import polygamma
 import adjlikelihood as al
-import pdb
 
 def calculate_logprior(disper, disperFitted, varPrior):
 

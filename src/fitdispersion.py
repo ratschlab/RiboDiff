@@ -7,17 +7,17 @@ def disper_fit(data):
     countRiboMean=np.reshape(countRiboMean, (len(countRiboMean), 1))
     disperRaw = data.disperRaw
     #disperRaw = disperRaw.flatten()
-    beta = np.array([0.1, 1])
+    beta = np.array([1, 0.1])
 
     iter = 10
     for i in range(iter):
-        ratio = disperRaw / (beta[0] + beta[1]/countRiboMean)
+        ratio = disperRaw / (beta[0] / countRiboMean + beta[1])
         idx = np.logical_and(ratio>1e-4, ratio<15)
 
         matrix = np.empty((len(np.nonzero(idx)[0]), 2))
         matrix.fill(np.nan)
-        matrix[:, 0] = 1
-        matrix[:, 1] = 1 / countRiboMean[idx]
+        matrix[:, 0] = 1 / countRiboMean[idx]
+        matrix[:, 1] = 1
 
         modGamma = sm.GLM(disperRaw[idx], matrix, family=sm.families.Gamma(sm.families.links.identity))
         result = modGamma.fit(start_params=beta)
@@ -38,6 +38,7 @@ def disper_fit(data):
     index = ~np.isnan(disperRaw)
     disperFitted[index] = beta[0] / countRiboMean[index] + beta[1]
     data.disperFitted = disperFitted
+    data.beta = beta
 
     print '*'*25
     print 'Fit dispersion: Done.'
