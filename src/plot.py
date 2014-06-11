@@ -30,6 +30,8 @@ def plot_dispersion(data, fileName):
     yUpBound  = np.percentile(disperRaw[index], 95)
     ax.set_xlim(xLowBound, xUpBound)
     ax.set_ylim(yLowBound, yUpBound)
+    #ax.set_xlim(0, 2000)
+    #ax.set_ylim(0, 0.1)
 
     plt.xlabel('Mean count of Ribosome Footprint')
     plt.ylabel('Dispersion')
@@ -77,4 +79,4 @@ if __name__ == '__main__':
             data = pickle.load(FileIn)
 
         plot_dispersion(data, sys.argv[2])
-        plot_TEchange(data, sys.argv[3], 0.05)
+        plot_TEchange(data, sys.argv[3], threshold=0.05)

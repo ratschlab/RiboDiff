@@ -18,7 +18,7 @@ def disper_raw(data):
     librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
 
     ###create varibles for plotting
-    emptyArray = np.empty((5, 10))
+    emptyArray = np.empty((7, 10))
     emptyArray.fill(np.nan)
     dispersion = emptyArray.copy()
     deviance = emptyArray.copy()
@@ -36,17 +36,17 @@ def disper_raw(data):
         if sum(data.countRibo[i, :]) >= cntCutoff and sum(data.countRNA[i, :]) >= cntCutoff:
             response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
             disper = 0.1
-            for j in range(10):
+            for k in range(10):
                 modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
                 result = modNB.fit()
                 #print result.summary()
                 #print result.mu
 
                 ###assign values to varibles for plotting.
-                if cnt < 5:
-                    dispersion[cnt, j] = disper
-                    deviance[cnt, j] = result.deviance
-                    likelihood[cnt, j] = result.llf
+                if cnt < 7:
+                    dispersion[cnt, k] = disper
+                    deviance[cnt, k] = result.deviance
+                    likelihood[cnt, k] = result.llf
                 ####################################################################
 
                 disperBef = disper
@@ -54,13 +54,22 @@ def disper_raw(data):
                 sign = -1.0
                 res  = minimize_scalar(al.adj_loglikelihood, bounds=(0, 1), args=(explanatory, response, yhat, sign), tol=1e-5, method='Bounded')
                 disper = res.x
+
                 if abs(np.log(disper) - np.log(disperBef)) < 0.03:
+                    ### only for plotting the IRLS trend #################################################################################
+                    modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+                    result = modNB.fit()
+                    if cnt < 7:
+                        dispersion[cnt, k+1] = disper
+                        deviance[cnt, k+1] = result.deviance
+                        likelihood[cnt, k+1] = result.llf
+                    ######################################################################################################################
                     break
             disperRaw[i] = disper
 
-            ######plot the trends of changes of dispersion, deviance and likelihood.
+            #####plot the trends of changes of dispersion, deviance and likelihood.
             cnt += 1
-            if cnt == 5:
+            if cnt == 7:
                 fig, ax = plt.subplots()
                 for k in range(cnt):
                     ax.plot(np.arange(10), dispersion[k,], 'o-')
@@ -83,7 +92,7 @@ def disper_raw(data):
                 plt.savefig('/Users/zhongyi/Yi/Work/RFSeq/src/plot_likelihood.pdf')
                 print 'Plotting: Done!'
                 cnt == -1
-            #######################################################################
+            ######################################################################
 
     data.disperRaw = disperRaw
 
