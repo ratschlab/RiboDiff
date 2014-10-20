@@ -1,49 +1,39 @@
-import sys
-import loadinput as ld
-import normalize as nm
 import creatematrix as cm
-import rawdispersion as rd
-import fitdispersion as fd
-import adjdispersion as ad
+import rawdisp as rd
+import fitdisp as fd
+import adjdisp as ad
+import cPickle as pickle
 
-def usage():
+def estimate_disp(data, opts):
 
-    sys.stderr.write('Usage:' + '\n' + 'python estimatedisp.py Experiment_Outline_File Gene_Count_File' + '\n')
-
-def estimate_disp(data, mthd='simp'):
-
-    #explanatory = cm.create_matrix_0(data.exper, model='H1')
-    #explanatory = cm.create_matrix_1(data.exper, model='H1')
-    explanatory = cm.create_matrix_2(data.exper, model='H1')
+    explanatory = cm.create_matrix(data, model='H1')
+    #import statsmodels.api as sm
     #explanatory = sm.add_constant(explanatory, prepend=False)
     data.matrix = explanatory
 
-    if mthd == 'simp':
-        data = rd.disper_raw(data)
-        data = fd.disper_fit(data)
-        data = ad.disper_adj(data)
+    outpath = opts.resPath
+    pklFile = outpath + 'TmpData.pkl'
+
+    if opts.dispDiff:
+        data = rd.disper_raw(data, opts)
+    else:
+        data = rd.disper_raw_scalar(data, opts)
+    with open(pklFile, 'wb') as FileOut:
+        pickle.dump(data, FileOut, pickle.HIGHEST_PROTOCOL)
+
+    print '*'*25
+
+    data = fd.disper_fit(data, opts)
+    with open(pklFile, 'wb') as FileOut:
+        pickle.dump(data, FileOut, pickle.HIGHEST_PROTOCOL)
+
+    print '*'*25
+
+    if opts.dispDiff:
+        data = ad.disper_adj(data, opts)
+    else:
+        data = ad.disper_adj_scalar(data, opts)
+    with open(pklFile, 'wb') as FileOut:
+        pickle.dump(data, FileOut, pickle.HIGHEST_PROTOCOL)
 
     return data
-
-if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        usage()
-    else:
-        print '*'*25
-        FileIn = ld.LoadInputs(sys.argv[1], sys.argv[2])
-        data = FileIn.parse_exper()
-        data = FileIn.read_count()
-        print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size
-        print '*'*25
-        data.libSizesRibo = nm.lib_size(data.countRibo)
-        data.libSizesRNA = nm.lib_size(data.countRNA)
-        print 'Library size:'
-        #np.set_printoptions(precision=3)
-        print data.experRF
-        print data.libSizesRibo
-        print data.experRNA
-        print data.libSizesRNA
-        print '*'*25
-        data = estimate_disp(data, mthd='simp')
-        print 'Estimate dispersion: Done.'
-        print '*'*25
