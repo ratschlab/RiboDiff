@@ -2,7 +2,6 @@
 
 import sys
 from parseopts import *
-import pdb
 
 def main():
 
@@ -25,13 +24,13 @@ def main():
 
     print '*'*25
     data.libSizesRibo = nm.lib_size(data.countRibo)
-    data.libSizesRNA  = nm.lib_size(data.countRNA)
+    data.libSizesRna  = nm.lib_size(data.countRna)
     print 'Library size:'
     np.set_printoptions(precision=3)
     print data.experRibo
     print data.libSizesRibo
-    print data.experRNA
-    print data.libSizesRNA
+    print data.experRna
+    print data.libSizesRna
 
     print '*'*25
     data = ed.estimate_disp(data, opts)

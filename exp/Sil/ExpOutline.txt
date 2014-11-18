@@ -1,0 +1,11 @@
+Samples,Data_Type,Conditions
+RiboCon1,Ribo-Seq,Control
+RiboCon2,Ribo-Seq,Control
+RiboSil1,Ribo-Seq,Treated
+RiboSil3,Ribo-Seq,Treated
+TotalCon1,RNA-Seq,Control
+TotalCon2,RNA-Seq,Control
+TotalCon3,RNA-Seq,Control
+TotalSil1,RNA-Seq,Treated
+TotalSil2,RNA-Seq,Treated
+TotalSil3,RNA-Seq,Treated

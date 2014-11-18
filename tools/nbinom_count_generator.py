@@ -7,7 +7,7 @@
 
 import sys
 import numpy as np
-from scipy.stats import norm
+from scipy.stats import gamma
 from scipy.stats import nbinom
 import random
 
@@ -26,24 +26,24 @@ def parse_options(argv):
 
     optional = OptionGroup(parser, 'OPTIONAL')
 
-    optional.add_option('--nParamNB', action='store', type='float', dest='nParamNB', default=1, help='Assume the mean read count follows negative binomial distribution. This argument ' \
-                        'is for the n parameter. [default: 1]')
-    optional.add_option('--pParamNB', action='store', type='float', dest='pParamNB', default=0.001, help='Assume the mean read count follows negative binomial distribution. This argument ' \
-                        'is for the p parameter. It controls the read count level. For instance, use 0.001 for RNA-seq, and 0.01~0.001 for Ribo-seq. [default: 0.001]')
+    optional.add_option('--nParamNB', action='store', type='float', dest='nParamNB', default=1, help='Assume the mean read count of each entry follows negative binomial distribution. ' \
+                        'This argument is for the n parameter. [default: 1]')
+    optional.add_option('--pParamNB', action='store', type='float', dest='pParamNB', default=0.01, help='Assume the mean read count of each entry follows negative binomial distribution. ' \
+                        'This argument is for the p parameter. It controls the read count level. For instance, use 0.001 for RNA-seq, and 0.001~0.01 for Ribo-seq. [default: 0.01]')
     optional.add_option('--beta1', action='store', type='float', dest='beta1', default=0.100, help='Assume disper = beta1 / MeanCount + beta2 (beta1 must > 0.0). [default: 0.1]')
     optional.add_option('--beta2', action='store', type='float', dest='beta2', default=0.001, help='Assume disper = beta1 / MeanCount + beta2 (beta2 must > 0.0). [default: 0.001]')
     optional.add_option('--dispFile', action='store', type='string', dest='dispFile', help='A text file contains dispersions from which the read count will be generated for every gene. ' \
-                        'The number of dispersions should equal to the number of genes. One dispersion per line in this text file. If this argument is on, the \'beta1\' and \'beta2\' ' \
+                        'The number of dispersions should equal to the number of entries. One dispersion per line in this text file. If this argument is on, the \'beta1\' and \'beta2\' ' \
                         'arguments will not be used.')
     optional.add_option('--addDisperError', action='store', type='float', dest='addDisperError', help='Add standard Gaussian distributed noise to log(dispersion) and use this dispersion ' \
                         'to generate read count. The value of this argument is the standard deviation of the Gaussian distribution. [defualt: no noise]')
     optional.add_option('--numDiff', action='store', type='int', dest='numDiff', help='How many entries show different mean read count. This script generates half as increased mean count ' \
                         'and half as decreased mean count. For example, 1001 out of 2000 genes showing different fold change, the program will generate 501 showing increase and 499 showing ' \
                         'decrease. [default: no gene showing different]')
-    optional.add_option('--meanFoldDiff', action='store', type='float', dest='meanFoldDiff', help='The MEAN fold change of mean read count in condition B compare to condition A. Users only ' \
-                        'need to specify either increased or decreased mean fold change, the program will calculate the other. For example, by specifying 1.5 fold change, 501 genes have ' \
-                        'mean fold change equal to 3/2, and 499 genes have mean fold change equal to 2/3.  Fold change values for genes are Gaussian distributed. [defult: no gene showing ' \
-                        'different]')
+    optional.add_option('--shapeGamma', action='store', type='float', dest='shapeGamma', default=2.0, help='Assume fold change of mean read count in two conditions follows gamma ' \
+                        'distribution. Use this argument to set the shape paramter. [default: 1.5]')
+    optional.add_option('--scaleGamma', action='store', type='float', dest='scaleGamma', default=0.5, help='Assume fold change of mean read count in two conditions follows gamma ' \
+                        'distribution. Use this argument to set the scale paramter. [default: 0.5]')
 
     parser.add_option_group(required)
     parser.add_option_group(optional)
@@ -59,10 +59,6 @@ def parse_options(argv):
         if not options.__dict__[eachM]:
             sys.stderr.write('\nError: --%s is a required option.\n\n' % eachM)
             sys.exit()
-
-    if (options.numDiff and not options.meanFoldDiff) or (options.meanFoldDiff and not options.numDiff):
-        sys.stderr.write('\n--numDiff and --foldDiff should be used together.\n\n')
-        sys.exit()
 
     return options
 
@@ -84,7 +80,7 @@ def generate_count(options):
     idx = np.nonzero(mu == 0.0)[0]
     mu[idx] = 1
 
-    # Generate dispersions for all entries.
+    # Generate dispersions for all genes.
     if not options.dispFile:
         # Generate dispersions as a function of mean count for all genes.
         disper = beta1 / mu + beta2
@@ -105,7 +101,7 @@ def generate_count(options):
     muB = mu.copy()
 
     # For some genes, generate read count with different mean value in different conditions.
-    if options.numDiff and options.meanFoldDiff:
+    if options.numDiff:
         if options.numDiff > options.numEntry:
             print 'numDiff should be smaller than numGene!'
             sys.exit()
@@ -116,28 +112,20 @@ def generate_count(options):
         numDiffUp = round(numDiff / 2.0)
         numDiffDn = numDiff - numDiffUp
 
+        shapeParam = options.shapeGamma
+        scaleParam = options.scaleGamma
+
         # If fold change value of increased gene set is x, the decreased set is 1/x.
-        meanFoldDiffUp = options.meanFoldDiff
-        meanFoldDiffDn = 1 / meanFoldDiffUp
-
-        randomNormUp = norm.rvs(loc=0.0, scale=3**0.5, size=numDiffUp)
-        probMax = norm.pdf(0.0, loc=0.0, scale=3**0.5)
-        foldDiffUp = meanFoldDiffUp + randomNormUp / abs(randomNormUp) * (meanFoldDiffUp - 1) * (1 - norm.pdf(randomNormUp, loc=0.0, scale=3**0.5) / probMax)
-
-        randomNormDn = norm.rvs(loc=0.0, scale=3**0.5, size=numDiffDn)
-        probMax = norm.pdf(0.0, loc=0.0, scale=3**0.5)
-        foldDiffDn = meanFoldDiffDn + randomNormDn / abs(randomNormDn) * (1 - meanFoldDiffDn) * (1 - norm.pdf(randomNormDn, loc=0.0, scale=3**0.5) / probMax)
+        foldDiffUp = gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffUp)
+        foldDiffDn = 1.0 / gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffDn)
+        foldDiff = np.hstack([foldDiffUp, foldDiffDn])
 
         # Fold change genes are randomly selected.
         idx = random.sample(range(numGene), numDiff)
 
-        foldDiff = np.hstack([foldDiffUp, foldDiffDn])
-
-        # Change the mean count of condition A and condition B without changing the overall mean count across the two conditions.
-        # (MeanCountA + MeanCountB) / 2 = MeanCountOrigin & MeanCountA * FoldChange = MeanCountB
-        # This is because the dispersion of genes is generated from the overall mean counts, namely for each gene condition A and condition B have the same dispersion.
-        muA[idx] = 2 * mu[idx] / (foldDiff + 1)
+        # Change the mean count of condition B.
         muB[idx] = muA[idx] * foldDiff
+        disper[idx] = disper[idx] / 10.0
 
     n = 1.0 / disper
     pA = n / (n + muA)
@@ -150,7 +138,7 @@ def generate_count(options):
             z = numDigits - len(str(i+1))
             name = 'G' + '0'*z + str(i+1)
 
-            # The size / dispersion parameter is the same for both conditions. The probability parameters are different if there is fold change in mean count for different conditions. 
+            # The dispersion parameter (1/n) is the same for both conditions. The probability parameters are different if there is fold change in mean count for different conditions. 
             countListA = nbinom.rvs(n[i], pA[i], size=numSampleConA).tolist()
             countListB = nbinom.rvs(n[i], pB[i], size=numSampleConB).tolist()
             countList  = countListA + countListB

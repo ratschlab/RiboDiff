@@ -8,51 +8,127 @@ import matplotlib.pyplot as plt
 from optparse import OptionParser, OptionGroup
 import pdb
 
-def usage():
+def empDisp_scatter(data, fileOutName):
 
-    sys.stderr.write('Usage:' + '\n' + 'python plot.py data.pkl FigDispersionRibo.pdf FigDispersionRNA.pdf FigTEchange.pdf' + '\n')
+    cntRiboNorm = np.around(data.countRibo / data.libSizesRibo)
+    cntRnaNorm  = np.around(data.countRna  / data.libSizesRna )
 
-def boxplot_disp(disperRibo, disperRNA, fileOutName):
+    idx = np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 5, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 5).nonzero()[0]
 
-    idx1 = ~np.isnan(disperRibo)
-    idx2 = ~np.isnan(disperRNA)
+    cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
+    cntRnaMean  = np.mean(cntRnaNorm[idx],  axis=1)
 
-    disp = [np.log10(disperRibo[idx1]), np.log10(disperRNA[idx2])]
+    varRibo = np.var(cntRiboNorm[idx], axis=1, ddof=0)
+    varRna  = np.var(cntRnaNorm[idx],  axis=1, ddof=0)
+
+    dispRibo = (varRibo - cntRiboMean) / cntRiboMean ** 2
+    dispRna  = (varRna  - cntRnaMean ) / cntRnaMean  ** 2
+
+    stdDispRibo = np.std(np.log10(dispRibo[dispRibo > 0]))
+    stdDispRna  = np.std(np.log10(dispRna[dispRna > 0]))
+
+    if np.percentile(np.log2(cntRnaMean), 99.0) >= np.percentile(np.log2(cntRiboMean), 99.0):
+        maxCnt = np.percentile(np.log2(cntRnaMean), 99.0)
+    else:
+        maxCnt = np.percentile(np.log2(cntRiboMean), 99.0)
+    if np.percentile(np.log2(cntRnaMean), 1.0) <= np.percentile(np.log2(cntRiboMean), 1.0):
+        minCnt = np.percentile(np.log2(cntRnaMean), 1.0)
+    else:
+        minCnt = np.percentile(np.log2(cntRiboMean), 1.0)
+
+    winSize = (maxCnt - minCnt) / 15.0
+    dispWinMedRibo = []
+    dispWinMedRna  = []
+    cntWinRibo  = []
+    cntWinRna   = []
+
+    for i in np.arange(minCnt, maxCnt, winSize):
+        IDX1 = np.logical_and(np.logical_and(np.log2(cntRiboMean) > i, np.log2(cntRiboMean) < i + winSize), dispRibo > 0).nonzero()[0]
+        IDX2 = np.logical_and(np.logical_and(np.log2(cntRnaMean)  > i, np.log2(cntRnaMean)  < i + winSize), dispRna  > 0).nonzero()[0]
+        if i + winSize / 2.0 <= np.percentile(np.log2(cntRiboMean), 99.0):
+            dispWinMedRibo.extend([np.median(dispRibo[IDX1])])
+            cntWinRibo.extend([i + winSize / 2.0])
+        if i + winSize / 2.0 <= np.percentile(np.log2(cntRnaMean), 99.0):
+            dispWinMedRna.extend([np.median(dispRna[IDX2])])
+            cntWinRna.extend([i + winSize / 2.0])
 
     fig, ax = plt.subplots()
-    bp = plt.boxplot(disp, notch=False, sym='b+', vert=True, whis=1.5, widths=0.25)
-    plt.setp(bp['boxes'], color='black')
-    plt.setp(bp['whiskers'], color='black')
-    ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', alpha=1.0)
-    ax.set_axisbelow(True)
-    ax.set_title('Dispersion comparison', fontsize=15)
-    ax.set_xlabel('')
-    ax.set_ylabel(r'$log_{10}$(Dispersion)', fontsize=12)
-    ax.set_xticklabels(['Ribo-Seq', 'RNA-Seq'])
-    ax.tick_params(axis='x', labelsize=12)
+
+    ax.scatter(np.log2(cntRnaMean[dispRna   > 0]), np.log10(dispRna[dispRna   > 0]), marker='o', color='lightsalmon',  s=0.5, lw=0, label='RNA-Seq' )
+    ax.scatter(np.log2(cntRiboMean[dispRibo > 0]), np.log10(dispRibo[dispRibo > 0]), marker='o', color='lightskyblue', s=0.5, lw=0, label='Ribo-Seq')
+
+    ax.plot(cntWinRna,  np.log10(dispWinMedRna),  color='tomato', linestyle='-', marker='^', markersize=4, markeredgewidth=0, label='RNA-Seq, trend' )
+    ax.plot(cntWinRibo, np.log10(dispWinMedRibo), color='blue',   linestyle='-', marker='*', markersize=5, markeredgewidth=0, label='Ribo-Seq, trend')
+
+    smallestDisp = min(np.hstack([np.log10(dispRna[dispRna > 0]), np.log10(dispRibo[dispRibo > 0])]))
+    largestDisp  = max(np.hstack([np.log10(dispRna[dispRna > 0]), np.log10(dispRibo[dispRibo > 0])]))
+
+    lowerBound = np.floor(smallestDisp) - 3
+    upperBound = np.ceil(largestDisp) + 4
+
+    ax.scatter(np.log2(cntRnaMean[dispRna   <= 0]), np.repeat(lowerBound + 1.0, cntRnaMean[dispRna   <= 0].size), marker='o', color='lightsalmon',  s=0.5, lw=0)
+    ax.scatter(np.log2(cntRiboMean[dispRibo <= 0]), np.repeat(lowerBound + 0.8, cntRiboMean[dispRibo <= 0].size), marker='o', color='lightskyblue', s=0.5, lw=0)
+
+    if np.mod(np.floor(smallestDisp), 2) == 1:
+        lowerEndTick = np.floor(smallestDisp) - 1
+    else:
+        lowerEndTick = np.floor(smallestDisp)
+
+    if np.mod(upperBound, 2) == 1:
+        upperEndTick = upperBound - 1
+    else:
+        upperEndTick = upperBound
+
+    ax.set_ylim(lowerBound, upperBound)
+    ax.set_xlim(0, None)
+
+    ax.spines['left'].set_visible(False)
+    breakPoint = lowerEndTick + 1
+    ax.plot((0, 0), (breakPoint+0.15, upperBound), color='black', lw=1.5)
+    ax.plot((0, 0), (breakPoint-0.1,  lowerBound), color='black', lw=1.5)
+    ax.plot((-0.1, 0.1), (breakPoint, breakPoint+0.2), color='black', lw=1, clip_on=False)
+    ax.plot((-0.1, 0.1), (breakPoint-0.2, breakPoint), color='black', lw=1, clip_on=False)
+
+    lowerEndTick = lowerEndTick.astype(int)
+    upperEndTick = upperEndTick.astype(int)
+    plt.yticks(np.arange(lowerEndTick, upperEndTick+1, 2))
+    tklabels = ax.axes.get_yticks().tolist()
+    tklabels[0] = '-Inf'
+    ax.axes.set_yticklabels(tklabels)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.tick_params(axis='x', labelsize=10)
     ax.tick_params(axis='y', labelsize=10)
+
+    ax.legend(loc='upper right', prop={'size':9})
+    ax.set_xlabel(r'$log_{2}(mean\/counts)$', fontsize=15)
+    ax.set_ylabel(r'$log_{10}(dispersion)$', fontsize=15)
+    ax.set_title('Empirical dispersion')
+
+    ax.text(0.03, 0.96, r'$\sigma_{Ribo\/}=%1.2f$' % stdDispRibo, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
+    ax.text(0.03, 0.92, r'$\sigma_{RNA}=%1.2f$' % stdDispRna, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
 
     plt.savefig(fileOutName, format='pdf')
 
-def dotplot_disp(countMean, disperRaw, disperAdj, beta, fileOutName, whatSeq):
+def dotplot_disp(countMean, dispRaw, dispFitted, dispAdj, beta, fileOutName, whatSeq):
 
     fig, ax = plt.subplots()
-    idx = np.logical_and(countMean>1, ~np.isnan(disperAdj))
-    ax.scatter(np.log2(countMean[idx]), np.log10(disperRaw[idx]), marker='o', color='silver', s=4, lw=0, label='Raw')
-    #IDX = np.logical_and(idx, mthd=='Nelder')
-    #ax.scatter(np.log2(countMean[IDX]), np.log10(disperRaw[IDX]), marker='o', color='blue', s=4, lw=0, label='Raw')
-    ax.scatter(np.log2(countMean[idx]), np.log10(disperAdj[idx]), marker='o', color='mediumturquoise', s=4, lw=0, label='Adjusted')
-    countMeanSorted = np.sort(countMean[idx])
-    disperFittedCal = beta[0]/countMeanSorted + beta[1]
+    idx = np.logical_and(countMean>1, ~np.isnan(dispAdj))
+    ax.scatter(np.log2(countMean[idx]), np.log10(dispRaw[idx]), marker='o', color='silver', s=4, lw=0, label='Raw')
 
-    ax.plot(np.log2(countMeanSorted[disperFittedCal > 0]), np.log10(disperFittedCal[disperFittedCal > 0]), color='tomato', label='Fitted')
+    ax.scatter(np.log2(countMean[idx]), np.log10(dispAdj[idx]), marker='o', color='mediumturquoise', s=4, lw=0, label='Adjusted')
+
+    countMeanSorted = np.sort(countMean[idx])
+    dispFittedCal = beta[0]/countMeanSorted + beta[1]
+    ax.plot(np.log2(countMeanSorted[dispFittedCal > 0]), np.log10(dispFittedCal[dispFittedCal > 0]), color='tomato', label='Fitted')
 
     ax.legend(loc='upper right', prop={'size':10})
 
     #xLowBound = 0.0
     #xUpBound  = np.percentile(countMean[idx], 95.0)
-    #yLowBound = np.percentile(disperRaw[idx], 2.5)
-    #yUpBound  = np.percentile(disperRaw[idx], 97.5)
+    #yLowBound = np.percentile(dispRaw[idx], 2.5)
+    #yUpBound  = np.percentile(dispRaw[idx], 97.5)
     #ax.set_xlim(xLowBound, xUpBound)
     #ax.set_ylim(yLowBound, yUpBound)
 
@@ -65,9 +141,9 @@ def dotplot_disp(countMean, disperRaw, disperAdj, beta, fileOutName, whatSeq):
 
     plt.savefig(fileOutName, format='pdf')
 
-def dotplot_TEchange(countMean, logFoldChangeTE, disperAdj, padj, threshold, fileOutName):
+def dotplot_TEchange(countMean, logFoldChangeTE, dispAdj, padj, threshold, fileOutName):
 
-    index = ~np.isnan(disperAdj)
+    index = ~np.isnan(dispAdj)
     countMeanEff = countMean[index]
     logFoldChangeTeEff = logFoldChangeTE[index]
     padjEff = padj[index]
@@ -88,11 +164,9 @@ def dotplot_TEchange(countMean, logFoldChangeTE, disperAdj, padj, threshold, fil
 
     xLowBound = (np.percentile(countMeanSig, 97.5) - np.min(countMeanSig)) * -0.02
     xUpBound  = np.percentile(countMeanSig, 97.5)
-    yLowBound = np.percentile(logFoldChangeTeSig, 2.5)
-    yUpBound  = np.percentile(logFoldChangeTeSig, 97.5)
 
     ax.set_xlim(xLowBound, xUpBound)
-    ax.set_ylim(yLowBound, yUpBound)
+    ax.set_ylim(-5, 5)
 
     plt.savefig(fileOutName, format='pdf')
 
@@ -106,35 +180,35 @@ def make_plots(data, opts):
 
     if opts.dispDiff:
         fileOutNameBoxplot = outputNamePrefix + '.disp.boxplot.pdf'
-        boxplot_disp(data.disperAdjRibo, data.disperAdjRNA, fileOutNameBoxplot)
+        boxplot_disp(data.dispAdjRibo, data.dispAdjRna, fileOutNameBoxplot)
 
     if opts.dispDiff:
         countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
         countRiboMean = np.reshape(countRiboMean, (countRiboMean.size, 1))
         fileOutNameDotplotRibo = outputNamePrefix + '.dispRibo.dotplot.pdf'
-        dotplot_disp(countRiboMean, data.disperRawRibo, data.disperAdjRibo, data.betaRibo, fileOutNameDotplotRibo, 'Ribo-Seq')
+        dotplot_disp(countRiboMean, data.dispRawRibo, data.dispAdjRibo, data.betaRibo, fileOutNameDotplotRibo, 'Ribo-Seq')
 
-        countRNAMean = np.mean(data.countRNA / data.libSizesRNA, axis=1)
-        countRNAMean = np.reshape(countRNAMean, (countRNAMean.size, 1))
-        fileOutNameDotplotRNA = outputNamePrefix + '.dispRNA.dotplot.pdf'
-        dotplot_disp(countRNAMean, data.disperRawRNA, data.disperAdjRNA, data.betaRNA, fileOutNameDotplotRNA, 'RNA-Seq')
+        countRnaMean = np.mean(data.countRna / data.libSizesRna, axis=1)
+        countRnaMean = np.reshape(countRnaMean, (countRnaMean.size, 1))
+        fileOutNameDotplotRna = outputNamePrefix + '.dispRNA.dotplot.pdf'
+        dotplot_disp(countRnaMean, data.dispRawRna, data.dispAdjRna, data.betaRna, fileOutNameDotplotRna, 'RNA-Seq')
     else:
         countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
         countMean = np.reshape(countMean, (countMean.size, 1))
         fileOutNameDotplot = outputNamePrefix + '.disp.dotplot.pdf'
-        dotplot_disp(countMean, data.disperRaw, data.disperAdj, data.beta, fileOutNameDotplot, '')
+        dotplot_disp(countMean, data.dispRaw, data.dispAdj, data.beta, fileOutNameDotplot, '')
 
     countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
     countMean = np.reshape(countMean, (countMean.size, 1))
     logFoldChangeTE = data.logFoldChangeTE
     if opts.dispDiff:
-        disperAdj = data.disperAdjRibo
+        dispAdj = data.dispAdjRibo
     else:
-        disperAdj = data.disperAdj
+        dispAdj = data.dispAdj
     padj = data.padj
     threshold = 0.1
     fileOutNameDotplotTE = outputNamePrefix + '.TEchange.dotplot.pdf'
-    dotplot_TEchange(countMean, logFoldChangeTE, disperAdj, padj, threshold, fileOutNameDotplotTE)
+    dotplot_TEchange(countMean, logFoldChangeTE, dispAdj, padj, threshold, fileOutNameDotplotTE)
 
 def parse_options(argv):
 
@@ -145,7 +219,7 @@ def parse_options(argv):
     required.add_option('-o', action='store', type='string', dest='outputPrefix', help='Specify the prefix of the output file name.')
 
     optional = OptionGroup(parser, 'OPTIONAL')
-    optional.add_option('-p', action='store', type='string', dest='plotWhich', default='All', help='Which figure to be plotted. Options: BoxDisp, DotDisp, DotTE or All. [default: All]')
+    optional.add_option('-p', action='store', type='string', dest='plotWhich', default='All', help='Which figure to be plotted. Options: EmpDisp, EstDisp, TE or All. [default: All]')
 
     parser.add_option_group(required)
     parser.add_option_group(optional)
@@ -171,8 +245,8 @@ def parse_options(argv):
                 sys.stderr.write('\nError: Path \'%s\' of the output file does not exist.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
                 sys.exit()
 
-    if opts.plotWhich not in ['BoxDisp', 'DotDisp', 'DotTE', 'All']:
-        parser.error('-p option can only take \'BoxDisp\', \'DotDisp\', \'DotTE\' or \'All\' as argument.\n')
+    if opts.plotWhich not in ['EmpDisp', 'EstDisp', 'TE', 'All']:
+        parser.error('-p option can only take \'EmpDisp\', \'EstDisp\', \'TE\' or \'All\' as argument.\n')
 
     return opts
 
@@ -183,38 +257,40 @@ if __name__ == '__main__':
     with open(opts.dataPkl, 'rb') as FileIn:
         data = pickle.load(FileIn)
 
-    if data.dispDiff:
-        if opts.plotWhich in ['BoxDisp', 'All']:
-            fileOutNameBoxplot = opts.outputPrefix + '.disp.boxplot.pdf'
-            boxplot_disp(data.disperAdjRibo, data.disperAdjRNA, fileOutNameBoxplot)
+    if opts.plotWhich in ['EmpDisp', 'All']:
+        fileOutName = opts.outputPrefix + '.EmpDisp.scatter.pdf'
+        empDisp_scatter(data, fileOutName)
 
-        if opts.plotWhich in ['DotDisp', 'All']:
-            countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
-            countRiboMean = np.reshape(countRiboMean, (countRiboMean.size, 1))
-            fileOutNameDotplotRibo = opts.outputPrefix + '.dispRibo.dotplot.pdf'
-            dotplot_disp(countRiboMean, data.disperRawRibo, data.disperAdjRibo, data.betaRibo, fileOutNameDotplotRibo, 'Ribo-Seq')
-
-            countRNAMean = np.mean(data.countRNA / data.libSizesRNA, axis=1)
-            countRNAMean = np.reshape(countRNAMean, (countRNAMean.size, 1))
-            fileOutNameDotplotRNA = opts.outputPrefix + '.dispRNA.dotplot.pdf'
-            dotplot_disp(countRNAMean, data.disperRawRNA, data.disperAdjRNA, data.betaRNA, fileOutNameDotplotRNA, 'RNA-Seq')
-    else:
-        if opts.plotWhich in ['DotDisp', 'All']:
-            countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
-            countMean = np.reshape(countMean, (countMean.size, 1))
-            fileOutNameDotplot = opts.outputPrefix + '.disp.dotplot.pdf'
-            dotplot_disp(countMean, data.disperRaw, data.disperAdj, data.beta, fileOutNameDotplot, '')
-
-    if opts.plotWhich in ['DotTE', 'All']:
-        countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
-        countMean = np.reshape(countMean, (countMean.size, 1))
-        logFoldChangeTE = data.logFoldChangeTE
-        if data.dispDiff:
-            disperAdj = data.disperAdjRibo
-        else:
-            disperAdj = data.disperAdj
-        padj = data.padj
-        threshold = 0.1
-        fileOutNameDotplotTE = opts.outputPrefix + '.TEchange.dotplot.pdf'
-        dotplot_TEchange(countMean, logFoldChangeTE, disperAdj, padj, threshold, fileOutNameDotplotTE)
+#        fileOutName = opts.outputPrefix + '.EmpDisp.hist.pdf'
+#        empDisp_hist(data, fileOutName)
+#
+#        if opts.plotWhich in ['DotDisp', 'All']:
+#            countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
+#            countRiboMean = np.reshape(countRiboMean, (countRiboMean.size, 1))
+#            fileOutNameDotplotRibo = opts.outputPrefix + '.dispRibo.dotplot.pdf'
+#            dotplot_disp(countRiboMean, data.dispRawRibo, data.dispFittedRibo, data.dispAdjRibo, data.betaRibo, fileOutNameDotplotRibo, 'Ribo-Seq')
+#
+#            countRnaMean = np.mean(data.countRna / data.libSizesRna, axis=1)
+#            countRnaMean = np.reshape(countRnaMean, (countRnaMean.size, 1))
+#            fileOutNameDotplotRna = opts.outputPrefix + '.dispRNA.dotplot.pdf'
+#            dotplot_disp(countRnaMean, data.dispRawRna, data.dispFittedRna, data.dispAdjRna, data.betaRna, fileOutNameDotplotRna, 'RNA-Seq')
+#    else:
+#        if opts.plotWhich in ['DotDisp', 'All']:
+#            countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
+#            countMean = np.reshape(countMean, (countMean.size, 1))
+#            fileOutNameDotplot = opts.outputPrefix + '.disp.dotplot.pdf'
+#            dotplot_disp(countMean, data.dispRaw, data.dispFitted, data.dispAdj, data.beta, fileOutNameDotplot, '')
+#
+#    if opts.plotWhich in ['DotTE', 'All']:
+#        countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
+#        countMean = np.reshape(countMean, (countMean.size, 1))
+#        logFoldChangeTE = data.logFoldChangeTE
+#        if data.dispDiff:
+#            dispAdj = data.dispAdjRibo
+#        else:
+#            dispAdj = data.dispAdj
+#        padj = data.padj
+#        threshold = 0.1
+#        fileOutNameDotplotTE = opts.outputPrefix + '.TEchange.dotplot.pdf'
+#        dotplot_TEchange(countMean, logFoldChangeTE, dispAdj, padj, threshold, fileOutNameDotplotTE)
 

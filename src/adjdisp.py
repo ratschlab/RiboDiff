@@ -6,42 +6,42 @@ from scipy.optimize import minimize_scalar
 from scipy.special import polygamma
 import adjlik as al
 
-def calculate_logprior(disper, disperFitted, varPrior):
+def calculate_logprior(disp, dispFitted, varPrior):
 
-    logprior = (np.log(disper) - np.log(disperFitted)) ** 2 / (2 * varPrior ** 2)
+    logprior = (np.log(disp) - np.log(dispFitted)) ** 2 / (2 * varPrior ** 2)
 
     return logprior
 
-def adj_loglikelihood_shrink(x, lenSampleRibo, lenSampleRNA, explanatory, response, yhat, disperFittedRibo, disperFittedRNA, varPriorRibo, varPriorRNA, sign):
+def adj_loglikelihood_shrink(x, lenSampleRibo, lenSampleRna, explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign):
 
-    loglik_adj = al.adj_loglikelihood(x, lenSampleRibo, lenSampleRNA, explanatory, response, yhat, 1.0)
-    logpriorRibo = calculate_logprior(x[0], disperFittedRibo, varPriorRibo)
-    logpriorRNA  = calculate_logprior(x[1], disperFittedRNA, varPriorRNA)
-    loglik_adj_shrk = loglik_adj - logpriorRibo - logpriorRNA
-
-    return loglik_adj_shrk * sign
-
-def adj_loglikelihood_shrink_scalar(disper, explanatory, response, yhat, disperFittedRibo, disperFittedRNA, varPriorRibo, varPriorRNA, sign):
-
-    loglik_adj = al.adj_loglikelihood_scalar(disper, explanatory, response, yhat, 1.0)
-    logpriorRibo = calculate_logprior(disper, disperFittedRibo, varPriorRibo)
-    logpriorRNA  = calculate_logprior(disper, disperFittedRNA, varPriorRNA)
-    loglik_adj_shrk = loglik_adj - logpriorRibo - logpriorRNA
+    loglik_adj = al.adj_loglikelihood(x, lenSampleRibo, lenSampleRna, explanatory, response, yhat, 1.0)
+    logpriorRibo = calculate_logprior(x[0], dispFittedRibo, varPriorRibo)
+    logpriorRna  = calculate_logprior(x[1], dispFittedRna, varPriorRna)
+    loglik_adj_shrk = loglik_adj - logpriorRibo - logpriorRna
 
     return loglik_adj_shrk * sign
 
-def adj_loglikelihood_shrink_scalar_onedisper(disper, explanatory, response, yhat, disperFitted, varPrior, sign):
+def adj_loglikelihood_shrink_scalar(disp, explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign):
 
-    loglik_adj = al.adj_loglikelihood_scalar(disper, explanatory, response, yhat, 1.0)
-    logprior = calculate_logprior(disper, disperFitted, varPrior)
+    loglik_adj = al.adj_loglikelihood_scalar(disp, explanatory, response, yhat, 1.0)
+    logpriorRibo = calculate_logprior(disp, dispFittedRibo, varPriorRibo)
+    logpriorRna  = calculate_logprior(disp, dispFittedRna, varPriorRna)
+    loglik_adj_shrk = loglik_adj - logpriorRibo - logpriorRna
+
+    return loglik_adj_shrk * sign
+
+def adj_loglikelihood_shrink_scalar_onedisper(disp, explanatory, response, yhat, dispFitted, varPrior, sign):
+
+    loglik_adj = al.adj_loglikelihood_scalar(disp, explanatory, response, yhat, 1.0)
+    logprior = calculate_logprior(disp, dispFitted, varPrior)
     loglik_adj_shrk = loglik_adj - logprior
 
     return loglik_adj_shrk * sign
 
-def calculate_varPrior(disperRaw, disperFitted, disperFittedIdx, varLogDispSamp):
+def calculate_varPrior(dispRaw, dispFitted, dispFittedIdx, varLogDispSamp):
 
-    LogResidule = np.log(disperRaw[disperFittedIdx]) - np.log(disperFitted[disperFittedIdx])
-    stdLogResidule = np.median(np.abs(LogResidule - np.median(LogResidule))) * 1.4826
+    logResidule = np.log(dispRaw[dispFittedIdx]) - np.log(dispFitted[dispFittedIdx])
+    stdLogResidule = np.median(np.abs(logResidule - np.median(logResidule))) * 1.4826
 
     varLogResidule = stdLogResidule ** 2
     varPrior = varLogResidule - varLogDispSamp
@@ -55,26 +55,26 @@ def disper_adj(data, opts):
     print 'Start to estimate adjusted dispersions.'
 
     num = len(data.geneIDs)
-    disperAdjRibo = np.empty((num, 1))
-    disperAdjRibo.fill(np.nan)
-    disperAdjRNA  = disperAdjRibo.copy()
-    disperAdjConv = disperAdjRibo.copy()
-    disperAdjMthd = np.empty((num, 1), dtype='S10')
-    disperAdjMthd.fill('nan')
+    dispAdjRibo = np.empty((num, 1))
+    dispAdjRibo.fill(np.nan)
+    dispAdjRna  = dispAdjRibo.copy()
+    dispAdjConv = dispAdjRibo.copy()
+    dispAdjMthd = np.empty((num, 1), dtype='S10')
+    dispAdjMthd.fill('nan')
 
     explanatory = data.matrix
-    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
+    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRna])
 
-    lenSampleRibo = len(data.idxRibo)
-    lenSampleRNA  = len(data.idxRNA)
+    lenSampleRibo = data.idxRibo.size
+    lenSampleRna  = data.idxRna.size
 
     matrix = data.matrix
     numSample = matrix.shape[0]
     numCoef = matrix.shape[1]
     varLogDispSamp = polygamma(1, (numSample - numCoef)/2)
 
-    varPriorRibo = calculate_varPrior(data.disperRawRibo, data.disperFittedRibo, data.disperFittedRiboIdx, varLogDispSamp)
-    varPriorRNA  = calculate_varPrior(data.disperRawRNA,  data.disperFittedRNA,  data.disperFittedRNAIdx,  varLogDispSamp)
+    varPriorRibo = calculate_varPrior(data.dispRawRibo, data.dispFittedRibo, data.dispFittedRiboIdx, varLogDispSamp)
+    varPriorRna  = calculate_varPrior(data.dispRawRna,  data.dispFittedRna,  data.dispFittedRnaIdx,  varLogDispSamp)
 
     for i in range(num):
 
@@ -85,63 +85,56 @@ def disper_adj(data, opts):
         if i+1 == num:
             print '\r%i genes finished.' % num
 
-        if not np.isnan(data.disperRawRibo[i]):
+        if not np.isnan(data.dispRawRibo[i]):
 
-            response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
+            response = np.hstack([data.countRibo[i, :], data.countRna[i, :]])
 
-            disperInitialRibo = opts.dispInitial
-            disperInitialRNA  = opts.dispInitial
-            disper = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
+            dispInitialRibo = opts.dispInitial
+            dispInitialRna  = opts.dispInitial
+            disp = np.hstack([np.repeat(dispInitialRibo, lenSampleRibo), np.repeat(dispInitialRna, lenSampleRna)])
+
+            dispFittedRibo = data.dispFittedRibo[i]
+            dispFittedRna  = data.dispFittedRna[i]
+            dispRawRibo = data.dispRawRibo[i]
+            dispRawRna  = data.dispRawRna[i]
 
             optimize_scalar = False
             mthd = 'SLSQP'
             j = 0
             while j < 10:
 
-                modNB = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+                modNB = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
                 result = modNB.fit()
 
-                disperBef = disper
-                x0 = [disperBef[0], disperBef[-1]]
+                dispBef = disp
+                x0 = [dispBef[0], dispBef[-1]]
                 yhat = result.mu
-                disperFittedRibo = data.disperFittedRibo[i]
-                disperFittedRNA  = data.disperFittedRNA[i]
                 sign = -1.0
 
                 if mthd == 'SLSQP':
-                    res = minimize(adj_loglikelihood_shrink, x0, args=(lenSampleRibo, lenSampleRNA, explanatory, response, yhat, disperFittedRibo, disperFittedRNA, varPriorRibo, varPriorRNA, sign), method='SLSQP', bounds=((0, None), (0, None)), tol=1e-5)
+                    res = minimize(adj_loglikelihood_shrink, x0, args=(lenSampleRibo, lenSampleRna, explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign), method='SLSQP', bounds=((0, 10.0), (0, 10.0)), tol=1e-5)
 
                 if mthd == 'Nelder' or (mthd == 'SLSQP' and (not res.success or np.isnan(res.fun))):
                     if mthd == 'SLSQP':
                         j = 0
-                        x0 = [disperInitialRibo, disperInitialRNA]
-                        disperBef = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
-                    res = minimize(adj_loglikelihood_shrink, x0, args=(lenSampleRibo, lenSampleRNA, explanatory, response, yhat, disperFittedRibo, disperFittedRNA, varPriorRibo, varPriorRNA, sign), method='Nelder-Mead', tol=1e-5)
+                        x0 = [dispInitialRibo, dispInitialRna]
+                        dispBef = np.hstack([np.repeat(dispInitialRibo, lenSampleRibo), np.repeat(dispInitialRna, lenSampleRna)])
+                    res = minimize(adj_loglikelihood_shrink, x0, args=(lenSampleRibo, lenSampleRna, explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign), method='Nelder-Mead', tol=1e-5)
                     mthd = 'Nelder'
 
                 if res.success:
-                    disper = np.hstack([np.repeat(res.x[0], lenSampleRibo), np.repeat(res.x[1], lenSampleRNA)])
-                    if abs(np.log(disper[0]) - np.log(disperBef[0])) < 0.01 and abs(np.log(disper[-1]) - np.log(disperBef[-1])) < 0.01:
-                        if mthd == 'SLSQP' and (disper[0] > 5.0 or disper[-1] > 5.0):
-                            j = 0
-                            mthd = 'Nelder'
-                            disper = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
-                            continue
-                        disperAdjRibo[i] = disper[0]
-                        disperAdjRNA[i]  = disper[-1]
-                        disperAdjConv[i] = True
-                        disperAdjMthd[i] = mthd
+                    disp = np.hstack([np.repeat(res.x[0], lenSampleRibo), np.repeat(res.x[1], lenSampleRna)])
+                    if abs(np.log(disp[0]) - np.log(dispBef[0])) < 0.01 and abs(np.log(disp[-1]) - np.log(dispBef[-1])) < 0.01:
+                        dispAdjRibo[i] = disp[0]
+                        dispAdjRna[i]  = disp[-1]
+                        dispAdjConv[i] = True
+                        dispAdjMthd[i] = mthd
                         break
                     elif j == 9:
-                        if mthd == 'SLSQP' and (disper[0] > 5.0 or disper[-1] > 5.0):
-                            j = 0
-                            mthd = 'Nelder'
-                            disper = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
-                            continue
-                        disperAdjRibo[i] = disper[0]
-                        disperAdjRNA[i]  = disper[-1]
-                        disperAdjConv[i] = False
-                        disperAdjMthd[i] = mthd
+                        dispAdjRibo[i] = disp[0]
+                        dispAdjRna[i]  = disp[-1]
+                        dispAdjConv[i] = False
+                        dispAdjMthd[i] = mthd
                     else:
                         pass
                 else:
@@ -152,34 +145,35 @@ def disper_adj(data, opts):
 
             if optimize_scalar:
 
-                disper = opts.dispInitial
+                disp = opts.dispInitial
                 for k in range(10):
-                    modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+                    modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
                     result = modNB.fit()
 
-                    disperBef = disper
+                    dispBef = disp
                     yhat = result.mu
                     sign = -1.0
-                    res  = minimize_scalar(adj_loglikelihood_shrink_scalar, args=(explanatory, response, yhat, disperFittedRibo, disperFittedRNA, varPriorRibo, varPriorRNA, sign), method='Bounded', bounds=(0, 20), tol=1e-5)
-                    disper = res.x
-                    if abs(np.log(disper) - np.log(disperBef)) < 0.01:
-                        disperAdjRibo[i] = disper
-                        disperAdjRNA[i]  = disper
-                        disperAdjConv[i] = True
-                        disperAdjMthd[i] = 'Bounded'
+                    res  = minimize_scalar(adj_loglikelihood_shrink_scalar, args=(explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign), method='Bounded', bounds=(0.0, 10.0), tol=1e-5)
+                    disp = res.x
+
+                    if abs(np.log(disp) - np.log(dispBef)) < 1e-4:
+                        dispAdjRibo[i] = disp
+                        dispAdjRna[i]  = disp
+                        dispAdjConv[i] = True
+                        dispAdjMthd[i] = 'Bounded'
                         break
                     elif k == 9:
-                        disperAdjRibo[i] = disper
-                        disperAdjRNA[i]  = disper
-                        disperAdjConv[i] = False
-                        disperAdjMthd[i] = 'Bounded'
+                        dispAdjRibo[i] = disp
+                        dispAdjRna[i]  = disp
+                        dispAdjConv[i] = False
+                        dispAdjMthd[i] = 'Bounded'
                     else:
                         pass
 
-    data.disperAdjRibo = disperAdjRibo
-    data.disperAdjRNA  = disperAdjRNA
-    data.disperAdjConv = disperAdjConv
-    data.disperAdjMthd = disperAdjMthd
+    data.dispAdjRibo = dispAdjRibo
+    data.dispAdjRna  = dispAdjRna
+    data.dispAdjConv = dispAdjConv
+    data.dispAdjMthd = dispAdjMthd
 
     return data
 
@@ -188,19 +182,19 @@ def disper_adj_scalar(data, opts):
     print 'Start to estimate adjusted dispersions.'
 
     num = len(data.geneIDs)
-    disperAdj = np.empty((num, 1))
-    disperAdj.fill(np.nan)
-    disperAdjConv = disperAdj.copy()
+    dispAdj = np.empty((num, 1))
+    dispAdj.fill(np.nan)
+    dispAdjConv = dispAdj.copy()
 
     explanatory = data.matrix
-    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
+    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRna])
 
     matrix = data.matrix
     numSample = matrix.shape[0]
     numCoef = matrix.shape[1]
     varLogDispSamp = polygamma(1, (numSample - numCoef)/2)
 
-    varPrior = calculate_varPrior(data.disperRaw, data.disperFitted, data.disperFittedIdx, varLogDispSamp)
+    varPrior = calculate_varPrior(data.dispRaw, data.dispFitted, data.dispFittedIdx, varLogDispSamp)
 
     for i in range(num):
 
@@ -211,33 +205,36 @@ def disper_adj_scalar(data, opts):
         if i+1 == num:
             print '\r%i genes finished.' % num
 
-        if not np.isnan(data.disperRaw[i]):
-            response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
+        if not np.isnan(data.dispRaw[i]):
 
-            disper = opts.dispInitial
+            response = np.hstack([data.countRibo[i, :], data.countRna[i, :]])
+
+            disp = opts.dispInitial
 
             for j in range(10):
-                modNB = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+                modNB = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
                 result = modNB.fit()
 
-                disperBef = disper
+                dispBef = disp
                 yhat = result.mu
-                disperFitted = data.disperFitted[i]
+                dispFitted = data.dispFitted[i]
+                dispRaw = data.dispRaw[i]
                 sign = -1.0
+                res = minimize_scalar(adj_loglikelihood_shrink_scalar_onedisper, args=(explanatory, response, yhat, dispFitted, varPrior, sign), method='Bounded', bounds=(0, 10.0), tol=1e-5)
+                disp = res.x
 
-                res  = minimize_scalar(adj_loglikelihood_shrink_scalar_onedisper, args=(explanatory, response, yhat, disperFitted, varPrior, sign), method='Bounded', bounds=(0, 20), tol=1e-5)
-                disper = res.x
-                if abs(np.log(disper) - np.log(disperBef)) < 0.01:
-                    disperAdj[i] = disper
-                    disperAdjConv[i] = True
+                if abs(np.log(disp) - np.log(dispBef)) < 1e-4:
+                    dispAdj[i] = disp
+                    dispAdjConv[i] = True
                     break
                 elif j == 9:
-                    disperAdj[i] = disper
-                    disperAdjConv[i] = False
+                    dispAdj[i] = disp
+                    dispAdjConv[i] = False
                 else:
                     pass
 
-    data.disperAdj = disperAdj
-    data.disperAdjConv = disperAdjConv
+    data.dispAdj = dispAdj
+    data.dispAdjConv = dispAdjConv
 
     return data
+

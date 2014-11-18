@@ -5,6 +5,7 @@ import numpy as np
 import loadinput as ld
 
 def usage():
+
     sys.stderr.write('Usage:' + '\n' + 'python normalize.py Experiment_Outline_File Count_File' + '\n')
 
 def lib_size(countNdarray):
@@ -24,12 +25,6 @@ def lib_size(countNdarray):
         idx = countNdarray[:, i] > 0
         librarySizes[i] = np.median(countNdarray[idx, i] / geoMeans[idx])
 
-    ### Plot histogram ############################
-    #matrix = countNdarray / geoMeans[:, np.newaxis]
-    #plt.hist(matrix[:,0], 40, range=(0, 2), color='blue')
-    #plt.savefig('./libsizeHistgram.pdf')
-    ###############################################
-
     return librarySizes
 
 if __name__ == '__main__':
@@ -41,13 +36,13 @@ if __name__ == '__main__':
         FileIn = ld.LoadInputs(sys.argv[1], sys.argv[2])
         data = FileIn.parse_expt()
         data = FileIn.read_count()
-        print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size
+        print 'Read input files: Done.\n%i Genes.' % data.geneIDs.size
         print '*'*25
         data.libSizesRibo = lib_size(data.countRibo)
-        data.libSizesRNA  = lib_size(data.countRNA)
+        data.libSizesRna  = lib_size(data.countRna)
         print 'Library size:'
         np.set_printoptions(precision=3)
         print data.experRibo
         print data.libSizesRibo
-        print data.experRNA
-        print data.libSizesRNA
+        print data.experRna
+        print data.libSizesRna

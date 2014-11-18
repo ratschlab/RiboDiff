@@ -13,18 +13,18 @@ def disper_raw(data, opts):
     print 'Start to estimate raw dispersions.'
 
     num = len(data.geneIDs)
-    disperRawRibo = np.empty((num, 1))
-    disperRawRibo.fill(np.nan)
-    disperRawRNA  = disperRawRibo.copy()
-    disperRawConv = disperRawRibo.copy()
-    disperRawMthd = np.empty((num, 1), dtype='S10')
-    disperRawMthd.fill('nan')
+    dispRawRibo = np.empty((num, 1))
+    dispRawRibo.fill(np.nan)
+    dispRawRna  = dispRawRibo.copy()
+    dispRawConv = dispRawRibo.copy()
+    dispRawMthd = np.empty((num, 1), dtype='S10')
+    dispRawMthd.fill('nan')
 
     explanatory = data.matrix
-    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
+    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRna])
 
-    lenSampleRibo = len(data.idxRibo)
-    lenSampleRNA  = len(data.idxRNA)
+    lenSampleRibo = data.idxRibo.size
+    lenSampleRna  = data.idxRna.size
 
     for i in range(num):
 
@@ -35,108 +35,90 @@ def disper_raw(data, opts):
         if i+1 == num:
             print '\r%i genes finished.' % num
 
-        if sum(data.countRibo[i, :] / data.libSizesRibo) >= cntCutoff and sum(data.countRNA[i, :] / data.libSizesRNA) >= cntCutoff:
+        if sum(data.countRibo[i, :] / data.libSizesRibo) >= cntCutoff and sum(data.countRna[i, :] / data.libSizesRna) >= cntCutoff:
 
-            response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
+            response = np.hstack([data.countRibo[i, :], data.countRna[i, :]])
 
-            disperInitialRibo = opts.dispInitial
-            disperInitialRNA  = opts.dispInitial
-            disper = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
+            dispInitialRibo = opts.dispInitial
+            dispInitialRna  = opts.dispInitial
+            disp = np.hstack([np.repeat(dispInitialRibo, lenSampleRibo), np.repeat(dispInitialRna, lenSampleRna)])
 
-            if opts.dispDiff == 2:
+            optimize_scalar = False
 
-                optimize_scalar = False
+            mthd = 'SLSQP'
+            j = 0
+            while j < 10:
 
-                mthd = 'SLSQP'
-                j = 0
-                while j < 10:
+                modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
+                result = modNB.fit()
 
-                    modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
-                    result = modNB.fit()
+                dispBef = disp
+                x0 = [dispBef[0], dispBef[-1]]
+                yhat = result.mu
+                sign = -1.0
 
-                    disperBef = disper
-                    x0 = [disperBef[0], disperBef[-1]]
-                    yhat = result.mu
-                    sign = -1.0
+                if mthd == 'SLSQP':
+                    res = minimize(al.adj_loglikelihood, x0, args=(lenSampleRibo, lenSampleRna, explanatory, response, yhat, sign), method='SLSQP', bounds=((0, 10.0), (0, 10.0)), tol=1e-5)
 
+                if mthd == 'Nelder' or (mthd == 'SLSQP' and (not res.success or np.isnan(res.fun))):
                     if mthd == 'SLSQP':
-                        res = minimize(al.adj_loglikelihood, x0, args=(lenSampleRibo, lenSampleRNA, explanatory, response, yhat, sign), method='SLSQP', bounds=((0, None), (0, None)), tol=1e-5)
+                        j = 0
+                        x0 = [dispInitialRibo, dispInitialRna]
+                        dispBef = np.hstack([np.repeat(dispInitialRibo, lenSampleRibo), np.repeat(dispInitialRna, lenSampleRna)])
+                    res = minimize(al.adj_loglikelihood, x0, args=(lenSampleRibo, lenSampleRna, explanatory, response, yhat, sign), method='Nelder-Mead', tol=1e-5)
+                    mthd = 'Nelder'
 
-                    if mthd == 'Nelder' or (mthd == 'SLSQP' and (not res.success or np.isnan(res.fun))):
-                        if mthd == 'SLSQP':
-                            j = 0
-                            x0 = [disperInitialRibo, disperInitialRNA]
-                            disperBef = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
-                        res = minimize(al.adj_loglikelihood, x0, args=(lenSampleRibo, lenSampleRNA, explanatory, response, yhat, sign), method='Nelder-Mead', tol=1e-5)
-                        mthd = 'Nelder'
-
-                    if res.success:
-                        disper = np.hstack([np.repeat(res.x[0], lenSampleRibo), np.repeat(res.x[1], lenSampleRNA)])
-                        if abs(np.log(disper[0]) - np.log(disperBef[0])) < 0.01 and abs(np.log(disper[-1]) - np.log(disperBef[-1])) < 0.01:
-
-                            if mthd == 'SLSQP' and (disper[0] > 5.0 or disper[-1] > 5.0):
-                                j = 0
-                                mthd = 'Nelder'
-                                disper = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
-                                continue
-
-                            if np.log10(disper[0]) < -5.0 or np.log10(disper[-1]) < -5.0 or abs(abs(np.log10(disper[0])) - abs(np.log10(disper[-1]))) > 5.0:
-                                optimize_scalar = True
-                                break
-
-                            disperRawRibo[i] = disper[0]
-                            disperRawRNA[i]  = disper[-1]
-                            disperRawConv[i] = True
-                            disperRawMthd[i] = mthd
-                            break
-                        elif j == 9:
-                            if mthd == 'SLSQP' and (disper[0] > 5.0 or disper[-1] > 5.0):
-                                j = 0
-                                mthd = 'Nelder'
-                                disper = np.hstack([np.repeat(disperInitialRibo, lenSampleRibo), np.repeat(disperInitialRNA, lenSampleRNA)])
-                                continue
-                            disperRawRibo[i] = disper[0]
-                            disperRawRNA[i] = disper[-1]
-                            disperRawConv[i] = False
-                            disperRawMthd[i] = mthd
-                        else:
-                            pass
-                    else:
-                        optimize_scalar = True
+                if res.success:
+                    disp = np.hstack([np.repeat(res.x[0], lenSampleRibo), np.repeat(res.x[1], lenSampleRna)])
+                    if abs(np.log(disp[0]) - np.log(dispBef[0])) < 0.01 and abs(np.log(disp[-1]) - np.log(dispBef[-1])) < 0.01:
+                        dispRawRibo[i] = disp[0]
+                        dispRawRna[i]  = disp[-1]
+                        dispRawConv[i] = True
+                        dispRawMthd[i] = mthd
                         break
+                    elif j == 9:
+                        dispRawRibo[i] = disp[0]
+                        dispRawRna[i] = disp[-1]
+                        dispRawConv[i] = False
+                        dispRawMthd[i] = mthd
+                    else:
+                        pass
+                else:
+                    optimize_scalar = True
+                    break
 
-                    j += 1
+                j += 1
 
-            if opts.dispDiff == 1 or optimize_scalar:
+            if optimize_scalar:
 
-                disper = opts.dispInitial
+                disp = opts.dispInitial
                 for k in range(10):
-                    modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+                    modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
                     result = modNB.fit()
 
-                    disperBef = disper
+                    dispBef = disp
                     yhat = result.mu
                     sign = -1.0
-                    res  = minimize_scalar(al.adj_loglikelihood_scalar, args=(explanatory, response, yhat, sign), method='Bounded', bounds=(0, 20), tol=1e-5)
-                    disper = res.x
-                    if abs(np.log(disper) - np.log(disperBef)) < 0.01:
-                        disperRawRibo[i] = disper
-                        disperRawRNA[i]  = disper
-                        disperRawConv[i] = True
-                        disperRawMthd[i] = 'Bounded'
+                    res  = minimize_scalar(al.adj_loglikelihood_scalar, args=(explanatory, response, yhat, sign), method='Bounded', bounds=(0.0, 10.0), tol=1e-5)
+                    disp = res.x
+                    if abs(np.log(disp) - np.log(dispBef)) < 1e-4:
+                        dispRawRibo[i] = disp
+                        dispRawRna[i]  = disp
+                        dispRawConv[i] = True
+                        dispRawMthd[i] = 'Bounded'
                         break
                     elif k == 9:
-                        disperRawRibo[i] = disper
-                        disperRawRNA[i]  = disper
-                        disperRawConv[i] = False
-                        disperRawMthd[i] = 'Bounded'
+                        dispRawRibo[i] = disp
+                        dispRawRna[i]  = disp
+                        dispRawConv[i] = False
+                        dispRawMthd[i] = 'Bounded'
                     else:
                         pass
 
-    data.disperRawRibo = disperRawRibo
-    data.disperRawRNA  = disperRawRNA
-    data.disperRawConv = disperRawConv
-    data.disperRawMthd = disperRawMthd
+    data.dispRawRibo = dispRawRibo
+    data.dispRawRna  = dispRawRna
+    data.dispRawConv = dispRawConv
+    data.dispRawMthd = dispRawMthd
 
     return data
 
@@ -147,12 +129,12 @@ def disper_raw_scalar(data, opts):
     print 'Start to estimate raw dispersions.'
 
     num = len(data.geneIDs)
-    disperRaw = np.empty((num, 1))
-    disperRaw.fill(np.nan)
-    disperRawConv = disperRaw.copy()
+    dispRaw = np.empty((num, 1))
+    dispRaw.fill(np.nan)
+    dispRawConv = dispRaw.copy()
 
     explanatory = data.matrix
-    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRNA])
+    librarySizes = np.hstack([data.libSizesRibo, data.libSizesRna])
 
     for i in range(num):
 
@@ -163,33 +145,33 @@ def disper_raw_scalar(data, opts):
         if i+1 == num:
             print '\r%i genes finished.' % num
 
-        if sum(data.countRibo[i, :] / data.libSizesRibo) >= cntCutoff and sum(data.countRNA[i, :] / data.libSizesRNA) >= cntCutoff:
+        if sum(data.countRibo[i, :] / data.libSizesRibo) >= cntCutoff and sum(data.countRna[i, :] / data.libSizesRna) >= cntCutoff:
 
-            response = np.hstack([data.countRibo[i, :], data.countRNA[i, :]])
+            response = np.hstack([data.countRibo[i, :], data.countRna[i, :]])
 
-            disper = opts.dispInitial
+            disp = opts.dispInitial
 
             for k in range(10):
-                modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disper), offset=np.log(librarySizes))
+                modNB  = sm.GLM(response, explanatory, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
                 result = modNB.fit()
 
-                disperBef = disper
+                dispBef = disp
                 yhat = result.mu
                 sign = -1.0
-                res = minimize_scalar(al.adj_loglikelihood_scalar, args=(explanatory, response, yhat, sign), method='Bounded', bounds=(0, 20), tol=1e-5)
-                disper = res.x
+                res = minimize_scalar(al.adj_loglikelihood_scalar, args=(explanatory, response, yhat, sign), method='Bounded', bounds=(0, 10.0), tol=1e-5)
+                disp = res.x
 
-                if abs(np.log(disper) - np.log(disperBef)) < 0.01:
-                    disperRaw[i] = disper
-                    disperRawConv[i] = True
+                if abs(np.log(disp) - np.log(dispBef)) < 1e-4:
+                    dispRaw[i] = disp
+                    dispRawConv[i] = True
                     break
                 elif k == 9:
-                    disperRaw[i] = disper
-                    disperRawConv[i] = False
+                    dispRaw[i] = disp
+                    dispRawConv[i] = False
                 else:
                     pass
 
-    data.disperRaw = disperRaw
-    data.disperRawConv = disperRawConv
+    data.dispRaw = dispRaw
+    data.dispRawConv = dispRawConv
 
     return data

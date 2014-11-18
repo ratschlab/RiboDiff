@@ -3,65 +3,61 @@
 import sys
 import numpy as np
 
-def usage():
-
-    sys.stderr.write('Usage:' + '\n' + 'python loadinput.py Experiment_Outline_File Count_File' + '\n')
-
 class LoadInputs(object):
 
-    """ Read the experiment description file, and use it to guide to read gene count file 
-        and store all data as a class object containing relative attributes """
+    """ Read the experiment description file, and use it to guide reading gene count file. 
+        Store all data as a class object containing relative attributes """
 
     def __init__(self, opts):
         self.fileNameExper = opts.exptOutline
         self.fileNameCount = opts.cntFile
-        self.experiment = np.empty([1, 1], dtype='str')
-        self.exper = np.empty([1, 1], dtype='str')
+        self.experiment= np.empty([1, 1], dtype='str')
+        self.exper     = np.empty([1, 1], dtype='str')
         self.experRibo = np.empty([1, 1], dtype='str')
-        self.experRNA  = np.empty([1, 1], dtype='str')
-        self.experCtl = np.empty([1, 1], dtype='str')
-        self.experTrt = np.empty([1, 1], dtype='str')
+        self.experRna  = np.empty([1, 1], dtype='str')
+        self.experCtl  = np.empty([1, 1], dtype='str')
+        self.experTrt  = np.empty([1, 1], dtype='str')
         self.idxRibo = np.empty([1, 1], dtype='int')
-        self.idxRNA  = np.empty([1, 1], dtype='int')
-        self.idxCtl = np.empty([1, 1], dtype='int')
-        self.idxTrt = np.empty([1, 1], dtype='int')
+        self.idxRna  = np.empty([1, 1], dtype='int')
+        self.idxCtl  = np.empty([1, 1], dtype='int')
+        self.idxTrt  = np.empty([1, 1], dtype='int')
         self.geneIDs = np.empty([1, 1], dtype='str')
         self.countRibo = np.empty([1, 1], dtype='int')
-        self.countRNA  = np.empty([1, 1], dtype='int')
+        self.countRna  = np.empty([1, 1], dtype='int')
         self.headerRibo = np.empty([1, 1], dtype='str')
-        self.headerRNA  = np.empty([1, 1], dtype='str')
+        self.headerRna  = np.empty([1, 1], dtype='str')
         self.libSizesRibo = np.empty([1, 1], dtype='float')
-        self.libSizesRNA  = np.empty([1, 1], dtype='float')
+        self.libSizesRna  = np.empty([1, 1], dtype='float')
         self.matrix = np.empty([1, 1], dtype='int')
-        self.disperRaw  = np.empty([1, 1], dtype='float')
-        self.disperRawRibo = np.empty([1, 1], dtype='float')
-        self.disperRawRNA  = np.empty([1, 1], dtype='float')
-        self.disperRawConv = np.empty([1, 1], dtype='bool')
-        self.disperRawMthd = np.empty([1, 1], dtype='str')
-        self.disperFitted = np.empty([1, 1], dtype='float')
-        self.disperFittedRibo = np.empty([1, 1], dtype='float')
-        self.disperFittedRNA  = np.empty([1, 1], dtype='float')
-        self.disperFittedIdx = np.empty([1, 1], dtype='int')
-        self.disperFittedRiboIdx = np.empty([1, 1], dtype='int')
-        self.disperFittedRNAIdx  = np.empty([1, 1], dtype='int')
-        self.disperFittedConv = np.empty([1, 1], dtype='bool')
-        self.disperFittedRiboConv = np.empty([1, 1], dtype='bool')
-        self.disperFittedRNAConv  = np.empty([1, 1], dtype='bool')
-        self.beta = np.empty([1, 1], dtype='float')
+        self.dispRaw     = np.empty([1, 1], dtype='float')
+        self.dispRawRibo = np.empty([1, 1], dtype='float')
+        self.dispRawRna  = np.empty([1, 1], dtype='float')
+        self.dispRawConv = np.empty([1, 1], dtype='bool')
+        self.dispRawMthd = np.empty([1, 1], dtype='str')
+        self.dispFitted     = np.empty([1, 1], dtype='float')
+        self.dispFittedRibo = np.empty([1, 1], dtype='float')
+        self.dispFittedRna  = np.empty([1, 1], dtype='float')
+        self.dispFittedIdx  = np.empty([1, 1], dtype='int')
+        self.dispFittedRiboIdx = np.empty([1, 1], dtype='int')
+        self.dispFittedRnaIdx  = np.empty([1, 1], dtype='int')
+        self.dispFittedConv     = np.empty([1, 1], dtype='bool')
+        self.dispFittedRiboConv = np.empty([1, 1], dtype='bool')
+        self.dispFittedRnaConv  = np.empty([1, 1], dtype='bool')
+        self.beta     = np.empty([1, 1], dtype='float')
         self.betaRibo = np.empty([1, 1], dtype='float')
-        self.betaRNA  = np.empty([1, 1], dtype='float')
-        self.disperAdj = np.empty([1, 1], dtype='float')
-        self.disperAdjRibo = np.empty([1, 1], dtype='float')
-        self.disperAdjRNA  = np.empty([1, 1], dtype='float')
-        self.disperAdjConv = np.empty([1, 1], dtype='bool')
-        self.disperAdjMthd = np.empty([1, 1], dtype='str')
-        self.pval = np.empty([1, 1], dtype='float')
-        self.padj = np.empty([1, 1], dtype='float')
+        self.betaRna  = np.empty([1, 1], dtype='float')
+        self.dispAdj     = np.empty([1, 1], dtype='float')
+        self.dispAdjRibo = np.empty([1, 1], dtype='float')
+        self.dispAdjRna  = np.empty([1, 1], dtype='float')
+        self.dispAdjConv = np.empty([1, 1], dtype='bool')
+        self.dispAdjMthd = np.empty([1, 1], dtype='str')
+        self.pval  = np.empty([1, 1], dtype='float')
+        self.padj  = np.empty([1, 1], dtype='float')
         self.TEctl = np.empty([1, 1], dtype='float')
         self.TEtrt = np.empty([1, 1], dtype='float')
         self.logFoldChangeTE = np.empty([1, 1], dtype='float')
         self.dispDiff = opts.dispDiff
-        
+
     def parse_expt(self):
 
         """ Read the experiment description file """
@@ -70,19 +66,19 @@ class LoadInputs(object):
         self.exper = self.experiment.copy()
 
         # add codes to make it case insensative
-        idxRibo = self.exper[:, 1] == 'Ribosome_Footprint'
-        idxRNA  = self.exper[:, 1] == 'RNA_seq'
+        idxRibo = self.exper[:, 1] == 'Ribo-Seq'
+        idxRna  = self.exper[:, 1] == 'RNA-Seq'
         idxCtl  = self.exper[:, 2] == 'Control'
         idxTrt  = self.exper[:, 2] == 'Treated'
 
         self.exper[idxRibo,1] = 'Ribo'
-        self.exper[idxRNA, 1] = 'mRna'
+        self.exper[idxRna, 1] = 'mRna'
         self.exper[idxCtl, 2] = 'Control'
         self.exper[idxTrt, 2] = 'Treated'
         #
 
         self.experRibo = self.exper[idxRibo,0]
-        self.experRNA  = self.exper[idxRNA, 0]
+        self.experRna  = self.exper[idxRna, 0]
         self.experCtl  = self.exper[idxCtl, 0]
         self.experTrt  = self.exper[idxTrt, 0]
 
@@ -90,51 +86,41 @@ class LoadInputs(object):
 
     def read_count(self):
 
-        """ Read the discrete reads count file """
+        """ Load the discrete count file """
 
         with open(self.fileNameCount, 'r') as FileIn:
-            header = np.array(FileIn.readline().rstrip().split('\t'), dtype=str)
+            header = np.array(FileIn.readline().strip().split('\t'), dtype=str)
 
         # add codes to dectect if the column name in the header of the count file agree with that in Experiment Outline File 
         idxRibo = np.in1d(header, self.experRibo).nonzero()[0]
-        idxRNA  = np.in1d(header, self.experRNA ).nonzero()[0]
+        idxRna  = np.in1d(header, self.experRna ).nonzero()[0]
         idxCtl  = np.in1d(header, self.experCtl ).nonzero()[0]
         idxTrt  = np.in1d(header, self.experTrt ).nonzero()[0]
         #
 
         idxRiboCtl = np.intersect1d(idxRibo, idxCtl)
         idxRiboTrt = np.intersect1d(idxRibo, idxTrt)
-        idxRNACtl  = np.intersect1d(idxRNA,  idxCtl)
-        idxRNATrt  = np.intersect1d(idxRNA,  idxTrt)
+        idxRnaCtl  = np.intersect1d(idxRna,  idxCtl)
+        idxRnaTrt  = np.intersect1d(idxRna,  idxTrt)
 
         self.headerRibo = header[np.hstack([idxRiboCtl, idxRiboTrt])]
-        self.headerRNA  = header[np.hstack([idxRNACtl,  idxRNATrt ])]
+        self.headerRna  = header[np.hstack([idxRnaCtl,  idxRnaTrt ])]
 
         geneIDs = np.loadtxt(self.fileNameCount, dtype=str, skiprows=1, usecols=(0,))
-        self.geneIDs = geneIDs.reshape(len(geneIDs), 1)
+        self.geneIDs = geneIDs.reshape(geneIDs.size, 1)
 
         countRiboCtl = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRiboCtl)
         countRiboTrt = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRiboTrt)
         self.countRibo = np.hstack([countRiboCtl, countRiboTrt])
 
-        countRNACtl = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRNACtl)
-        countRNATrt = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRNATrt)
-        self.countRNA = np.hstack([countRNACtl, countRNATrt])
+        countRnaCtl = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRnaCtl)
+        countRnaTrt = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRnaTrt)
+        self.countRna = np.hstack([countRnaCtl, countRnaTrt])
 
         self.idxRibo = np.arange(self.countRibo.shape[1])
-        self.idxRNA  = np.arange(self.countRNA.shape[1]) + len(self.idxRibo)
-        self.idxCtl  = np.hstack([np.arange(len(idxRiboCtl)), np.arange(len(idxRNACtl)) + len(self.idxRibo)])
-        self.idxTrt  = np.hstack([np.arange(len(idxRiboTrt)) + len(idxRiboCtl), np.arange(len(idxRNATrt)) + len(self.idxRibo) + len(idxRNACtl)])
+        self.idxRna  = np.arange(self.countRna.shape[1]) + self.idxRibo.size
+        self.idxCtl  = np.hstack([np.arange(idxRiboCtl.size), np.arange(idxRnaCtl.size) + self.idxRibo.size])
+        self.idxTrt  = np.hstack([np.arange(idxRiboTrt.size) + idxRiboCtl.size, np.arange(idxRnaTrt.size) + self.idxRibo.size + idxRnaCtl.size])
 
         return self
 
-if __name__ == '__main__':
-
-    if len(sys.argv) != 3:
-        usage()
-    else:
-        print '*'*25
-        FileIn = LoadInputs(sys.argv[1], sys.argv[2])
-        data = FileIn.parse_expt()
-        data = FileIn.read_count()
-        print 'Read input files: Done.\n%i Gene(s) to be tested.' % data.geneIDs.size

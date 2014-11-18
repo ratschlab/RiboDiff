@@ -48,7 +48,7 @@ def parse_options(argv):
             else:
                 opts.__dict__['resPath'] = os.path.dirname(opts.__dict__[eachOpt]) + os.getcwd()[0]
 
-    if opts.dispDiff not in [0, 1, 2]:
+    if opts.dispDiff not in [0, 1]:
         parser.error('-d option can only take either 0 or 1 as argument.\n')
 
     if opts.sumCntCutoff < 1:
@@ -67,3 +67,4 @@ def parse_options(argv):
         parser.error('-p option can only take either 0 or 1 as argument.\n')
 
     return opts
+
