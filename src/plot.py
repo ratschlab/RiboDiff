@@ -10,10 +10,10 @@ import pdb
 
 def empDisp_scatter(data, fileOutName):
 
-    cntRiboNorm = np.around(data.countRibo / data.libSizesRibo)
-    cntRnaNorm  = np.around(data.countRna  / data.libSizesRna )
+    cntRiboNorm = data.countRibo / data.libSizesRibo
+    cntRnaNorm  = data.countRna  / data.libSizesRna 
 
-    idx = np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 5, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 5).nonzero()[0]
+    idx = np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 1, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 1).nonzero()[0]
 
     cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
     cntRnaMean  = np.mean(cntRnaNorm[idx],  axis=1)
@@ -24,8 +24,8 @@ def empDisp_scatter(data, fileOutName):
     dispRibo = (varRibo - cntRiboMean) / cntRiboMean ** 2
     dispRna  = (varRna  - cntRnaMean ) / cntRnaMean  ** 2
 
-    stdDispRibo = np.std(np.log10(dispRibo[dispRibo > 0]))
-    stdDispRna  = np.std(np.log10(dispRna[dispRna > 0]))
+    stdDispRibo = np.std(np.log10(dispRibo[dispRibo > 0]), ddof=1)
+    stdDispRna  = np.std(np.log10(dispRna[dispRna > 0]), ddof=1)
 
     if np.percentile(np.log2(cntRnaMean), 99.0) >= np.percentile(np.log2(cntRiboMean), 99.0):
         maxCnt = np.percentile(np.log2(cntRnaMean), 99.0)
@@ -45,10 +45,10 @@ def empDisp_scatter(data, fileOutName):
     for i in np.arange(minCnt, maxCnt, winSize):
         IDX1 = np.logical_and(np.logical_and(np.log2(cntRiboMean) > i, np.log2(cntRiboMean) < i + winSize), dispRibo > 0).nonzero()[0]
         IDX2 = np.logical_and(np.logical_and(np.log2(cntRnaMean)  > i, np.log2(cntRnaMean)  < i + winSize), dispRna  > 0).nonzero()[0]
-        if i + winSize / 2.0 <= np.percentile(np.log2(cntRiboMean), 99.0):
+        if i + winSize / 2.0 >= np.percentile(np.log2(cntRiboMean), 1.0) and i + winSize / 2.0 <= np.percentile(np.log2(cntRiboMean), 99.0):
             dispWinMedRibo.extend([np.median(dispRibo[IDX1])])
             cntWinRibo.extend([i + winSize / 2.0])
-        if i + winSize / 2.0 <= np.percentile(np.log2(cntRnaMean), 99.0):
+        if i + winSize / 2.0 >= np.percentile(np.log2(cntRnaMean), 1.0) and i + winSize / 2.0 <= np.percentile(np.log2(cntRnaMean), 99.0):
             dispWinMedRna.extend([np.median(dispRna[IDX2])])
             cntWinRna.extend([i + winSize / 2.0])
 
@@ -108,6 +108,61 @@ def empDisp_scatter(data, fileOutName):
 
     ax.text(0.03, 0.96, r'$\sigma_{Ribo\/}=%1.2f$' % stdDispRibo, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
     ax.text(0.03, 0.92, r'$\sigma_{RNA}=%1.2f$' % stdDispRna, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
+
+    plt.savefig(fileOutName, format='pdf')
+
+def empDisp_hist(data, fileOutName):
+
+    cntRiboNorm = data.countRibo / data.libSizesRibo
+    cntRnaNorm  = data.countRna  / data.libSizesRna 
+
+    idx = np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 1, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 1).nonzero()[0]
+
+    cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
+    cntRnaMean  = np.mean(cntRnaNorm[idx],  axis=1)
+
+    varRibo = np.var(cntRiboNorm[idx], axis=1, ddof=0)
+    varRna  = np.var(cntRnaNorm[idx],  axis=1, ddof=0)
+
+    dispRibo = (varRibo - cntRiboMean) / cntRiboMean ** 2
+    dispRna  = (varRna  - cntRnaMean ) / cntRnaMean  ** 2
+
+    index = np.logical_and(dispRibo > 0, dispRna > 0).nonzero()[0]
+    deltaLogDisps = np.log10(dispRibo[index]) - np.log10(dispRna[index])
+
+    num = index.size
+    meanDelta = np.mean(deltaLogDisps)
+    stdDelta  = np.std(deltaLogDisps, ddof=1)
+
+    fig, ax = plt.subplots()
+
+    minDelta = min(deltaLogDisps)
+    maxDelta = max(deltaLogDisps)
+    lowerBound = np.floor(minDelta)
+    upperBound = np.ceil(maxDelta)
+    winSize = (upperBound - lowerBound) / 40.0
+    ax.hist(deltaLogDisps, np.arange(lowerBound, upperBound, winSize), histtype='bar', align='mid', color='limegreen', lw=0.5, edgecolor='white')
+
+    if lowerBound < 0.0 and upperBound > 0.0:
+        ax.set_xlim(lowerBound, upperBound)
+    elif lowerBound >= 0.0:
+        ax.set_xlim(-0.1 * (upperBound - lowerBound), upperBound)
+    elif maxDelta <= 0.0:
+        ax.set_xlim(lowerBound, 0.1 * (upperBound - lowerBound))
+    ymin, ymax = plt.ylim()
+    ax.plot((0, 0), (ymax * 0.02, ymax * 0.98), linestyle='--', color='orange', lw=1)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
+
+    ax.set_xlabel(r'$log_{10}\alpha_{Ribo}-log_{10}\alpha_{RNA}$', fontsize=15)
+    ax.set_title(r'Distribution of dispersion difference')
+
+    ax.text(0.88, 0.96, r'$n=%i$' % num, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
+    ax.text(0.88, 0.92, r'$\mu=%1.2f$' % meanDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
+    ax.text(0.88, 0.88, r'$\sigma=%1.2f$' % stdDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
 
     plt.savefig(fileOutName, format='pdf')
 
@@ -261,8 +316,8 @@ if __name__ == '__main__':
         fileOutName = opts.outputPrefix + '.EmpDisp.scatter.pdf'
         empDisp_scatter(data, fileOutName)
 
-#        fileOutName = opts.outputPrefix + '.EmpDisp.hist.pdf'
-#        empDisp_hist(data, fileOutName)
+        fileOutName = opts.outputPrefix + '.EmpDisp.hist.pdf'
+        empDisp_hist(data, fileOutName)
 #
 #        if opts.plotWhich in ['DotDisp', 'All']:
 #            countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
