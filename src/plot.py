@@ -318,7 +318,7 @@ if __name__ == '__main__':
 
         fileOutName = opts.outputPrefix + '.EmpDisp.hist.pdf'
         empDisp_hist(data, fileOutName)
-#
+
 #        if opts.plotWhich in ['DotDisp', 'All']:
 #            countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
 #            countRiboMean = np.reshape(countRiboMean, (countRiboMean.size, 1))
