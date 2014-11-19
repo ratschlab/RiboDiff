@@ -3,7 +3,6 @@
 import sys
 import numpy as np
 
-
 class LoadInputs(object):
 
     """ Read the experiment description file, and use it to guide reading gene count file. 
