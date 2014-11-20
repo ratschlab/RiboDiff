@@ -68,8 +68,8 @@ class LoadInputs(object):
         # add codes to make it case insensative
         idxRibo = self.exper[:, 1] == 'Ribo-Seq'
         idxRna  = self.exper[:, 1] == 'RNA-Seq'
-        idxCtl  = self.exper[:, 2] == 'Control'
-        idxTrt  = self.exper[:, 2] == 'Treated'
+        idxCtl  = self.exper[:, 2] == 'Condition1'
+        idxTrt  = self.exper[:, 2] == 'Condition2'
 
         self.exper[idxRibo,1] = 'Ribo'
         self.exper[idxRna, 1] = 'mRna'

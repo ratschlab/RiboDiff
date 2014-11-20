@@ -166,62 +166,44 @@ def empDisp_hist(data, fileOutName):
 
     plt.savefig(fileOutName, format='pdf')
 
-def dotplot_disp(countMean, dispRaw, dispFitted, dispAdj, beta, fileOutName, whatSeq):
+def cnt_deltaTE_scatter(data, fileOutName):
+
+    threshold = 0.1
+
+    cntRiboNorm = data.countRibo / data.libSizesRibo
+    cntRnaNorm  = data.countRna  / data.libSizesRna
+
+    padj = data.padj.flatten()
+
+    idx = np.logical_and(~np.isnan(padj), np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 2, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 2)).nonzero()[0]
+    cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
+    logFoldChangeTE = data.logFoldChangeTE[idx]
+
+    index = np.logical_and(padj < threshold, np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 2, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 2)).nonzero()[0]
+    cntRiboMeanSig = np.mean(cntRiboNorm[index], axis=1)
+    logFoldChangeTEsig = data.logFoldChangeTE[index]
 
     fig, ax = plt.subplots()
-    idx = np.logical_and(countMean>1, ~np.isnan(dispAdj))
-    ax.scatter(np.log2(countMean[idx]), np.log10(dispRaw[idx]), marker='o', color='silver', s=4, lw=0, label='Raw')
 
-    ax.scatter(np.log2(countMean[idx]), np.log10(dispAdj[idx]), marker='o', color='mediumturquoise', s=4, lw=0, label='Adjusted')
+    ax.scatter(cntRiboMean, logFoldChangeTE, marker='o', color='silver', s=1, lw=0, label='Tested genes')
+    ax.scatter(cntRiboMeanSig, logFoldChangeTEsig, marker='o', color='orange', s=1, lw=0, label='Significant genes')
 
-    countMeanSorted = np.sort(countMean[idx])
-    dispFittedCal = beta[0]/countMeanSorted + beta[1]
-    ax.plot(np.log2(countMeanSorted[dispFittedCal > 0]), np.log10(dispFittedCal[dispFittedCal > 0]), color='tomato', label='Fitted')
+    ax.legend(loc='upper right', prop={'size':9})
 
-    ax.legend(loc='upper right', prop={'size':10})
+    xLowerBound = (np.percentile(cntRiboMeanSig, 99.0) - min(cntRiboMeanSig)) * -0.02
+    xUpperBound = np.percentile(cntRiboMeanSig, 99.0)
 
-    #xLowBound = 0.0
-    #xUpBound  = np.percentile(countMean[idx], 95.0)
-    #yLowBound = np.percentile(dispRaw[idx], 2.5)
-    #yUpBound  = np.percentile(dispRaw[idx], 97.5)
-    #ax.set_xlim(xLowBound, xUpBound)
-    #ax.set_ylim(yLowBound, yUpBound)
+    ax.set_xlim(xLowerBound, xUpperBound)
+    ax.set_ylim(np.percentile(logFoldChangeTE, 0.5), np.percentile(logFoldChangeTE, 99.5))
 
-    if whatSeq:
-        ax.set_title('Dispersion estimation for %s' % whatSeq)
-    else:
-        ax.set_title('Dispersion estimation')
-    plt.xlabel('Mean count')
-    plt.ylabel('Dispersion')
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.tick_params(axis='x', labelsize=10)
+    ax.tick_params(axis='y', labelsize=10)
 
-    plt.savefig(fileOutName, format='pdf')
-
-def dotplot_TEchange(countMean, logFoldChangeTE, dispAdj, padj, threshold, fileOutName):
-
-    index = ~np.isnan(dispAdj)
-    countMeanEff = countMean[index]
-    logFoldChangeTeEff = logFoldChangeTE[index]
-    padjEff = padj[index]
-
-    idx = padjEff < threshold
-    countMeanSig = countMeanEff[idx]
-    logFoldChangeTeSig = logFoldChangeTeEff[idx]
-
-    fig, ax = plt.subplots()
-    ax.scatter(countMeanEff, logFoldChangeTeEff, marker='o', color='silver', s=3, lw=0, label='Tested genes')
-    ax.scatter(countMeanSig, logFoldChangeTeSig, marker='o', color='orange', s=3, lw=0, label='Significant genes')
-
-    ax.legend(loc='upper right', prop={'size':10})
-
-    ax.set_title('Overview of TE fold change')
-    plt.xlabel('Mean count')
-    plt.ylabel('log2 TE fold change')
-
-    xLowBound = (np.percentile(countMeanSig, 97.5) - np.min(countMeanSig)) * -0.02
-    xUpBound  = np.percentile(countMeanSig, 97.5)
-
-    ax.set_xlim(xLowBound, xUpBound)
-    ax.set_ylim(-5, 5)
+    ax.set_title(r'TE fold change')
+    ax.set_xlabel(r'$Mean\/count\/of\/Ribo-Seq$', fontsize=15)
+    ax.set_ylabel(r'$log_{2}(TE_{condition2}/TE_{condition1})$', fontsize=15)
 
     plt.savefig(fileOutName, format='pdf')
 
@@ -274,7 +256,7 @@ def parse_options(argv):
     required.add_option('-o', action='store', type='string', dest='outputPrefix', help='Specify the prefix of the output file name.')
 
     optional = OptionGroup(parser, 'OPTIONAL')
-    optional.add_option('-p', action='store', type='string', dest='plotWhich', default='All', help='Which figure to be plotted. Options: EmpDisp, EstDisp, TE or All. [default: All]')
+    optional.add_option('-p', action='store', type='string', dest='plotWhich', default='All', help='Which figure to be plotted. Options: EmpDisp, TE or All. [default: All]')
 
     parser.add_option_group(required)
     parser.add_option_group(optional)
@@ -300,8 +282,8 @@ def parse_options(argv):
                 sys.stderr.write('\nError: Path \'%s\' of the output file does not exist.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
                 sys.exit()
 
-    if opts.plotWhich not in ['EmpDisp', 'EstDisp', 'TE', 'All']:
-        parser.error('-p option can only take \'EmpDisp\', \'EstDisp\', \'TE\' or \'All\' as argument.\n')
+    if opts.plotWhich not in ['EmpDisp', 'TE', 'All']:
+        parser.error('-p option can only take \'EmpDisp\', \'TE\' or \'All\' as argument.\n')
 
     return opts
 
@@ -319,33 +301,7 @@ if __name__ == '__main__':
         fileOutName = opts.outputPrefix + '.EmpDisp.hist.pdf'
         empDisp_hist(data, fileOutName)
 
-#        if opts.plotWhich in ['DotDisp', 'All']:
-#            countRiboMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
-#            countRiboMean = np.reshape(countRiboMean, (countRiboMean.size, 1))
-#            fileOutNameDotplotRibo = opts.outputPrefix + '.dispRibo.dotplot.pdf'
-#            dotplot_disp(countRiboMean, data.dispRawRibo, data.dispFittedRibo, data.dispAdjRibo, data.betaRibo, fileOutNameDotplotRibo, 'Ribo-Seq')
-#
-#            countRnaMean = np.mean(data.countRna / data.libSizesRna, axis=1)
-#            countRnaMean = np.reshape(countRnaMean, (countRnaMean.size, 1))
-#            fileOutNameDotplotRna = opts.outputPrefix + '.dispRNA.dotplot.pdf'
-#            dotplot_disp(countRnaMean, data.dispRawRna, data.dispFittedRna, data.dispAdjRna, data.betaRna, fileOutNameDotplotRna, 'RNA-Seq')
-#    else:
-#        if opts.plotWhich in ['DotDisp', 'All']:
-#            countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
-#            countMean = np.reshape(countMean, (countMean.size, 1))
-#            fileOutNameDotplot = opts.outputPrefix + '.disp.dotplot.pdf'
-#            dotplot_disp(countMean, data.dispRaw, data.dispFitted, data.dispAdj, data.beta, fileOutNameDotplot, '')
-#
-#    if opts.plotWhich in ['DotTE', 'All']:
-#        countMean = np.mean(data.countRibo / data.libSizesRibo, axis=1)
-#        countMean = np.reshape(countMean, (countMean.size, 1))
-#        logFoldChangeTE = data.logFoldChangeTE
-#        if data.dispDiff:
-#            dispAdj = data.dispAdjRibo
-#        else:
-#            dispAdj = data.dispAdj
-#        padj = data.padj
-#        threshold = 0.1
-#        fileOutNameDotplotTE = opts.outputPrefix + '.TEchange.dotplot.pdf'
-#        dotplot_TEchange(countMean, logFoldChangeTE, dispAdj, padj, threshold, fileOutNameDotplotTE)
+    if opts.plotWhich in ['TE', 'All']:
+        fileOutName = opts.outputPrefix + '.Cnt-DeltaTE.scatter.pdf'
+        cnt_deltaTE_scatter(data, fileOutName)
 
