@@ -243,7 +243,7 @@ def cnt_deltaTE_scatter(data, fileOutName):
 
     ax.set_title(r'TE fold change')
     ax.set_xlabel(r'$Mean\/count\/of\/Ribo-Seq$', fontsize=15)
-    ax.set_ylabel(r'$log_{2}(TE_{condition2}/TE_{condition1})$', fontsize=15)
+    ax.set_ylabel(r'$log_{2}(TE_{conditionB}/TE_{conditionA})$', fontsize=15)
 
     plt.savefig(fileOutName, format='pdf')
 

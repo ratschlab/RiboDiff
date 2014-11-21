@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" This script generates two groups of negative binomial distributed discrete random variables. The two groups (condition 1 and condition 2) contain equal number of  
+""" This script generates two groups of negative binomial distributed discrete random variables. The two groups (condition A and condition B) contain equal number of  
     entries (GENE0001, GENE0002, ... GENE1000, ...), and each entry can have multiple replicates in each condition. The mean of each entry is also negative binomial 
     distributed. By using arguments '--beta1' and '--beta2', users can change the dispersion-mean relationship in order to generate different data set, for instance, 
     Ribo-Seq and RNA-Seq data. """
@@ -20,8 +20,8 @@ def parse_options(argv):
     required = OptionGroup(parser, 'REQUIRED')
 
     required.add_option('--numEntry', action='store', type='int', dest='numEntry', help='How many entries (genes / proteins) to be generated.')
-    required.add_option('--numSampleCon1', action='store', type='int', dest='numSampleConA', help='How many samples / replicates to be generated for condition A.')
-    required.add_option('--numSampleCon2', action='store', type='int', dest='numSampleConB', help='How many samples / replicates to be generated for condition B.')
+    required.add_option('--numSampleConA', action='store', type='int', dest='numSampleConA', help='How many samples / replicates to be generated for condition A.')
+    required.add_option('--numSampleConB', action='store', type='int', dest='numSampleConB', help='How many samples / replicates to be generated for condition B.')
     required.add_option('--output', action='store', type='string', dest='output', help='Output file name.')
 
     optional = OptionGroup(parser, 'OPTIONAL')
@@ -138,7 +138,7 @@ def generate_count(options):
 
     numDigits = len(str(numGene))
     with open(output, 'w') as FileOut:
-        FileOut.write('Entry\t' + 'Condition1\t'*numSampleConA + 'Condition2\t'*numSampleConB + 'Dispersion\t' + 'MeanCond1\t' + 'MeanCond2\t' + 'MeanFoldChange\n')
+        FileOut.write('Entry\t' + 'ConditionA\t'*numSampleConA + 'ConditionB\t'*numSampleConB + 'Dispersion\t' + 'MeanCondA\t' + 'MeanCondB\t' + 'MeanFoldChange\n')
         for i in range(numGene):
             z = numDigits - len(str(i+1))
             name = 'G' + '0'*z + str(i+1)
