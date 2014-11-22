@@ -74,11 +74,11 @@ def generate_count(options):
     output = options.output
 
     # First generate the mean read count for each gene. Assume this mean value follows NB distribution (Observed from real data).
-    mu = nbinom.rvs(nParamNB, pParamNB, 0.0, numGene)
+    mu = nbinom.rvs(nParamNB, pParamNB, loc=0.0, size=numGene)
 
     # If the mean of certain genes are 0, change them as 1.
     idx = np.nonzero(mu == 0.0)[0]
-    mu[idx] = 1
+    mu[idx] = 1.0
 
     # Generate dispersions for all genes.
     if not options.dispFile:
@@ -138,19 +138,28 @@ def generate_count(options):
 
     numDigits = len(str(numGene))
     with open(output, 'w') as FileOut:
-        FileOut.write('Entry\t' + 'ConditionA\t'*numSampleConA + 'ConditionB\t'*numSampleConB + 'Dispersion\t' + 'MeanCondA\t' + 'MeanCondB\t' + 'MeanFoldChange\n')
+        FileOut.write('Entry\t' + 'conditionA\t'*numSampleConA + 'conditionB\t'*numSampleConB + 'Dispersion\t' + 'MeanCondA\t' + 'MeanCondB\t' + 'MeanFoldChange\t' + 'SetAsDiff\n')
         for i in range(numGene):
             z = numDigits - len(str(i+1))
             name = 'G' + '0'*z + str(i+1)
 
-            # The dispersion parameter (1/n) is the same for both conditions. The probability parameters are different if there is fold change in mean count for different conditions. 
+            # The dispersion parameter (1/n) is the same for both conditions. The probability parameters are different if there is fold change in mean count for different conditions.
             countListA = nbinom.rvs(n[i], pA[i], size=numSampleConA).tolist()
             countListB = nbinom.rvs(n[i], pB[i], size=numSampleConB).tolist()
             countList  = countListA + countListB
 
             countString = '\t'.join(str(element) for element in countList)
 
-            FileOut.write(name + '\t' + countString + '\t' + str(disper[i]) + '\t' + str(np.mean(countListA)) + '\t' + str(np.mean(countListB)) + '\t' + str((np.mean(countListB)+1e-5)/(np.mean(countListA)+1e-5)) + '\n') 
+            if not options.numDiff:
+                setAsDiff = '-1'
+            elif i in idxUp:
+                setAsDiff = '1'
+            elif i in idxDn:
+                setAsDiff = '2'
+            else:
+                setAsDiff = '0'
+
+            FileOut.write(name + '\t' + countString + '\t' + str(disper[i]) + '\t' + str(np.mean(countListA)) + '\t' + str(np.mean(countListB)) + '\t' + str((np.mean(countListB)+1e-5)/(np.mean(countListA)+1e-5)) + '\t' + setAsDiff + '\n')
 
 if __name__ == '__main__':
 
