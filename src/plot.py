@@ -230,11 +230,13 @@ def cnt_deltaTE_scatter(data, fileOutName):
 
     ax.legend(loc='upper right', prop={'size':9})
 
-    xLowerBound = (np.percentile(cntRiboMeanSig, 99.0) - min(cntRiboMeanSig)) * -0.02
-    xUpperBound = np.percentile(cntRiboMeanSig, 99.0)
+    xLowerBound = (np.percentile(cntRiboMean, 99.0) - min(cntRiboMean)) * -0.02
+    xUpperBound = np.percentile(cntRiboMean, 99.0)
 
-    ax.set_xlim(xLowerBound, xUpperBound)
-    ax.set_ylim(np.percentile(logFoldChangeTE, 0.5), np.percentile(logFoldChangeTE, 99.5))
+    ax.set_xlim(-30, 1300)
+    ax.set_ylim(-2.5, 2.5)
+    #ax.set_xlim(xLowerBound, xUpperBound)
+    #ax.set_ylim(np.percentile(logFoldChangeTE, 0.5), np.percentile(logFoldChangeTE, 99.5))
 
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().tick_left()

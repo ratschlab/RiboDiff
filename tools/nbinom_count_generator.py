@@ -124,13 +124,29 @@ def generate_count(options):
         idxUp = random.sample(idx, numDiffUp)
         idxDn = np.setdiff1d(idx, idxUp)
 
-        # Change the mean count of condition B. Assume there is a negative correlation between mean count and fold change.
-        idxUpMem = np.argsort(mu[idxUp])
-        idxDnMem = np.argsort(mu[idxDn])
-        muNewUp = np.sort(mu[idxUp]) * np.sort(foldDiffUp)[::-1]
-        muNewDn = np.sort(mu[idxDn]) * np.sort(foldDiffDn)
-        muB[idxUp][idxUpMem] = muNewUp
-        muB[idxDn][idxDnMem] = muNewDn
+        # Change the mean count of condition A and B. Assume there is a negative correlation between mean count and fold change.
+        #idxUpMem = np.searchsorted(np.sort(mu[idxUp]), mu[idxUp])
+        #idxDnMem = np.searchsorted(np.sort(mu[idxDn]), mu[idxDn])
+        #muNewUp = np.sort(mu[idxUp]) * np.sort(foldDiffUp)[::-1]
+        #muNewDn = np.sort(mu[idxDn]) * np.sort(foldDiffDn)
+        #muB[idxUp] = muNewUp[idxUpMem]
+        #muB[idxDn] = muNewDn[idxDnMem]
+
+        # Change the mean count of condition A and condition B without changing the overall mean count across the two conditions.
+        # (MeanCountA + MeanCountB) / 2 = MeanCountOrigin & MeanCountA * FoldChange = MeanCountB
+        # Assume there is a negative correlation between mean count and fold change.
+        idxUpMem = np.searchsorted(np.sort(mu[idxUp]), mu[idxUp])
+        idxDnMem = np.searchsorted(np.sort(mu[idxDn]), mu[idxDn])
+
+        muAnewUp = 2 * np.sort(mu[idxUp]) / (np.sort(foldDiffUp)[::-1] + 1)
+        muBnewUp = muAnewUp * np.sort(foldDiffUp)[::-1]
+        muA[idxUp] = muAnewUp[idxUpMem]
+        muB[idxUp] = muBnewUp[idxUpMem]
+
+        muAnewDn = 2 * np.sort(mu[idxDn]) / (np.sort(foldDiffDn) + 1)
+        muBnewDn = muAnewDn * np.sort(foldDiffDn)
+        muA[idxDn] = muAnewDn[idxDnMem]
+        muB[idxDn] = muBnewDn[idxDnMem]
 
     n = 1.0 / disper
     pA = n / (n + muA)

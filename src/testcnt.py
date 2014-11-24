@@ -41,8 +41,6 @@ def test_count(data, opts):
         else:
             disp = data.dispAdj[i]
 
-        if data.geneIDs[i] == 'ENSG00000054965': pdb.set_trace()
-
         modNB0 = sm.GLM(response, explanatory0, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
         modNB1 = sm.GLM(response, explanatory1, family=sm.families.NegativeBinomial(alpha=disp), offset=np.log(librarySizes))
         result0 = modNB0.fit()
