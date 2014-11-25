@@ -215,13 +215,14 @@ def cnt_deltaTE_scatter(data, fileOutName):
 
     padj = data.padj.flatten()
 
-    idx = np.logical_and(~np.isnan(padj), np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 2, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 2)).nonzero()[0]
-    cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
-    logFoldChangeTE = data.logFoldChangeTE[idx]
+    with np.errstate(invalid='ignore'):
+        idx = np.logical_and(~np.isnan(padj), np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 2, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 2)).nonzero()[0]
+        cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
+        logFoldChangeTE = data.logFoldChangeTE[idx]
 
-    index = np.logical_and(padj < threshold, np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 2, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 2)).nonzero()[0]
-    cntRiboMeanSig = np.mean(cntRiboNorm[index], axis=1)
-    logFoldChangeTEsig = data.logFoldChangeTE[index]
+        index = np.logical_and(padj < threshold, np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 2, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 2)).nonzero()[0]
+        cntRiboMeanSig = np.mean(cntRiboNorm[index], axis=1)
+        logFoldChangeTEsig = data.logFoldChangeTE[index]
 
     fig, ax = plt.subplots()
 
