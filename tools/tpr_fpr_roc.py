@@ -96,7 +96,7 @@ def plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFileName):
 
     ax.plot(FPR1, TPR1, linestyle='-', color='tomato', label='Single dispersion')
     ax.plot(FPR2, TPR2, linestyle='-', color='blue', label='Two dispersions')
-    ax.plot(FPR3, TPR3, linestyle='-', color='darkviolet', label='babel')
+    ax.plot(FPR3, TPR3, linestyle='-', color='violet', label='babel')
 
     ax.legend(loc='lower right', prop={'size':11})
 
