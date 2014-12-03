@@ -42,3 +42,4 @@ if __name__ == '__main__':
     fileOutName = sys.argv[3]
 
     qq_plot(data1, data2, fileOutName)
+
