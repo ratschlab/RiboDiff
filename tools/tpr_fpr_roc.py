@@ -50,7 +50,7 @@ def cal_TPR_FPR(simFileName, data):
     truePosID = entryID[diffMarker > 0]
     trueNegID = entryID[diffMarker == 0]
 
-    idx = np.argsort(data.padj, axis=None)
+    idx = np.argsort(data.pval, axis=None)
     geneIDs = data.geneIDs[idx]
     TPR = []
     FPR = []
@@ -71,12 +71,12 @@ def cal_TPR_FPR_babel(simFileName, babelFileName):
     truePosID = entryID[diffMarker > 0]
     trueNegID = entryID[diffMarker == 0]
 
-    babelFDRstr = np.loadtxt(babelFileName, dtype=str, delimiter='\t', skiprows=1, usecols=(6,))
-    babelFDRstr[babelFDRstr=='NA'] = 'nan'
-    babelFDR = babelFDRstr.astype(float)
+    babelPvalstr = np.loadtxt(babelFileName, dtype=str, delimiter='\t', skiprows=1, usecols=(5,))
+    babelPvalstr[babelPvalstr=='NA'] = 'nan'
+    babelPval = babelPvalstr.astype(float)
     babelID = np.loadtxt(babelFileName, dtype=str, delimiter='\t', skiprows=1, usecols=(1,))
 
-    idx = np.argsort(babelFDR, axis=None)
+    idx = np.argsort(babelPval, axis=None)
     geneIDs = babelID[idx]
     TPR = []
     FPR = []
