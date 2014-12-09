@@ -5,13 +5,19 @@ import cPickle as pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import pdb
- 
-def cal_tpr_fpr(simFileName, data):
+
+def cal_sn_sp(simFileName, data):
 
     diffMarker = np.loadtxt(simFileName, dtype=int, delimiter='\t', skiprows=1, usecols=(-1,))
     entryID = np.loadtxt(simFileName, dtype=str, delimiter='\t', skiprows=1, usecols=(0,))
     truePosID = entryID[diffMarker > 0]
     trueNegID = entryID[diffMarker == 0]
+
+    fdr = 0.15
+    with np.errstate(invalid='ignore'):
+        observedPosID = data.geneIDs[data.padj <= fdr]
+    pdb.set_trace()
+    sn = np.in1d(observedPosID, truePosID).nonzero()[0].size / float(truePosID.size)
 
     for fdr in np.arange(0.05, 0.151, 0.025):
         with np.errstate(invalid='ignore'):
@@ -115,22 +121,22 @@ def plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFileName):
 
 if __name__ == '__main__':
 
-    simFileName = sys.argv[1]
+    simFileName1 = sys.argv[1]
 
     with open(sys.argv[2], 'rb') as FileIn:
         data1 = pickle.load(FileIn)
 
-    with open(sys.argv[3], 'rb') as FileIn:
-        data2 = pickle.load(FileIn)
+    #with open(sys.argv[3], 'rb') as FileIn:
+    #    data2 = pickle.load(FileIn)
 
-    babelFileName = sys.argv[4]
+    #babelFileName = sys.argv[4]
 
-    rocFileName = sys.argv[-1]
+    #rocFileName = sys.argv[-1]
 
-    cal_tpr_fpr(simFileName, data1)
-    cal_tpr_fpr(simFileName, data2)
-    cal_tpr_fpr_babel(simFileName, babelFileName)
-    TPR1, FPR1 = cal_TPR_FPR(simFileName, data1)
-    TPR2, FPR2 = cal_TPR_FPR(simFileName, data2)
-    TPR3, FPR3 = cal_TPR_FPR_babel(simFileName, babelFileName)
-    plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFileName)
+    cal_sn_sp(simFileName1, data1)
+    #cal_tpr_fpr(simFileName, data2)
+    #cal_tpr_fpr_babel(simFileName, babelFileName)
+    #TPR1, FPR1 = cal_TPR_FPR(simFileName, data1)
+    #TPR2, FPR2 = cal_TPR_FPR(simFileName, data2)
+    #TPR3, FPR3 = cal_TPR_FPR_babel(simFileName, babelFileName)
+    #plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFileName)
