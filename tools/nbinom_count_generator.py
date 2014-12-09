@@ -40,6 +40,9 @@ def parse_options(argv):
     optional.add_option('--numDiff', action='store', type='int', dest='numDiff', help='How many entries show different mean read count. This script generates half entries as increased ' \
                         'mean count and another half as decreased mean count. For example, 1001 out of 20000 genes showing different fold change, the program will generate 500 showing ' \
                         'increase and 501 showing decrease. [default: no gene showing different]')
+    optional.add_option('--diffFile', action='store', type='string', dest='diffFile', help='A text file contains integers 1, 2 or 0 to indicate which entries should be generated with mean ' \
+                        'count UP, DOWN or NO CHANGE. The number of integers should equal to the number of entries. One integer per line in this text file. The program will randomly ' \
+                        'choose which entries to alter their mean counts, if this argument is not given.')
     optional.add_option('--shapeGamma', action='store', type='float', dest='shapeGamma', default=1.5, help='Assume fold change of mean read count between two conditions follows gamma ' \
                         'distribution. Use this argument to set the shape paramter. [default: 1.5]')
     optional.add_option('--scaleGamma', action='store', type='float', dest='scaleGamma', default=0.5, help='Assume fold change of mean read count between two conditions follows gamma ' \
@@ -101,16 +104,33 @@ def generate_count(options):
     muB = mu.copy()
 
     # For some genes, generate read count with different mean value in different conditions.
-    if options.numDiff:
-        if options.numDiff > options.numEntry:
+    if options.numDiff or options.diffFile:
+
+        # Fold change genes are randomly selected, or are chosen as indicated by file.
+        if not options.diffFile:
+            numDiff = options.numDiff
+
+            # The number of genes showing increased and decreased mean count is equal or 1 less. 
+            numDiffUp = numDiff / 2
+            numDiffDn = numDiff - numDiffUp
+
+            idx = random.sample(range(numGene), numDiff)
+            idxUp = random.sample(idx, numDiffUp)
+            idxDn = np.setdiff1d(idx, idxUp)
+        else:
+            diffInfo = np.loadtxt(options.diffFile, dtype=int, skiprows=0, usecols=(0,))
+ 
+            idxUp = (diffInfo==2).nonzero()[0]
+            idxDn = (diffInfo==1).nonzero()[0]
+
+            numDiffUp = idxUp.size
+            numDiffDn = idxDn.size
+
+            numDiff = numDiffUp + numDiffDn
+
+        if numDiff > options.numEntry:
             print 'numDiff should be smaller than numGene!'
             sys.exit()
-
-        numDiff = options.numDiff
-
-        # The number of genes showing increased and decreased mean count is equal or 1 less. 
-        numDiffUp = numDiff / 2
-        numDiffDn = numDiff - numDiffUp
 
         shapeParam = options.shapeGamma
         scaleParam = options.scaleGamma
@@ -118,11 +138,6 @@ def generate_count(options):
         # Assume fold changes of mean count of different genes follow gamma distribution. If fold change value of increased gene set is x, the decreased set is 1/x.
         foldDiffUp = gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffUp)
         foldDiffDn = 1.0 / gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffDn)
-
-        # Fold change genes are randomly selected.
-        idx = random.sample(range(numGene), numDiff)
-        idxUp = random.sample(idx, numDiffUp)
-        idxDn = np.setdiff1d(idx, idxUp)
 
         # Change the mean count of condition A and B. Assume there is a negative correlation between mean count and fold change.
         #idxUpMem = np.searchsorted(np.sort(mu[idxUp]), mu[idxUp])
@@ -166,7 +181,7 @@ def generate_count(options):
 
             countString = '\t'.join(str(element) for element in countList)
 
-            if not options.numDiff:
+            if not numDiff:
                 setAsDiff = '-1'
             elif i in idxUp:
                 setAsDiff = '1'
