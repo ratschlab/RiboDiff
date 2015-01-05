@@ -118,8 +118,8 @@ def get_sequences(genome, annoFile, geneList, seqType, seqFeature, outputFasta):
                 if Strand == '-':
                     seq = seq[::-1].translate(string.maketrans('ATGCNatgcn', 'TACGNtacgn'))
 
-                #FileOut.write('>%s.%s | %s\n' % (geneID, transcID, seqType))
-                FileOut.write('>%s|%s|%s\n' % (geneID, transcID, gene_name[geneID]))
+                FileOut.write('>%s|%s | %s\n' % (geneID, transcID, seqType))
+                #FileOut.write('>%s|%s|%s\n' % (geneID, transcID, gene_name[geneID]))
                 FileOut.write('%s\n' % seq)
 
         if seqType == 'GENE':

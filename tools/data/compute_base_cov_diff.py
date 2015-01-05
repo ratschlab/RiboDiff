@@ -89,7 +89,7 @@ def get_cov(bam, obj, Chr):
         right = obj[j, 1]
         cov = []
         pos = []
-        covExon = np.zeros(right-left+1)
+        covSegment = np.zeros(right-left+1)
         for eachBase in bamFile.pileup(Chr, left-1, right, truncate=True):
             cov.append(eachBase.nsegments)
             pos.append(eachBase.reference_pos)
@@ -98,9 +98,9 @@ def get_cov(bam, obj, Chr):
             posRegion = np.arange(left-1, right)
             #idx = np.in1d(posRegion, POS).nonzero()[0]
             idx = np.in1d(posRegion, POS)
-            covExon[idx] = cov
+            covSegment[idx] = cov
 
-        covRegion = np.hstack([covRegion, covExon])
+        covRegion = np.hstack([covRegion, covSegment])
 
     bamFile.close()
 
@@ -108,7 +108,7 @@ def get_cov(bam, obj, Chr):
 
 def get_diff(covRegion_A, covRegion_B, cutoff):
 
-    const = 1e-5
+    const = 1.0
     idxUsed = np.invert(np.logical_and(covRegion_A < cutoff, covRegion_B < cutoff))
     covRegionFoldCh = np.zeros_like(covRegion_A, dtype=float)
     covRegionFoldCh[idxUsed] = (covRegion_B[idxUsed] + const) / (covRegion_A[idxUsed] + const)
@@ -152,6 +152,8 @@ def main():
     seqFeature = 'ALL'
     outputFile = '/cbio/grlab/projects/RibosomeFootprint/CovChange/SilTEup.prot.5p.utr5.all.cutoff3.covdiff'
 
+    cutoff = 3.0
+
     bamFilesCondA = [bamDir + 'all_Control_1_Ribo.uq.sorted.rRNAfiltered.rtrimfilterd.25-35.final.bam', bamDir + 'all_Control_2_Ribo.uq.sorted.rRNAfiltered.rtrimfilterd.25-35.final.bam']
     bamFilesCondB = [bamDir + 'all_Silvestiol_1_Ribo.uq.sorted.rRNAfiltered.rtrimfilterd.25-35.final.bam', bamDir + 'all_Silvestiol_3_Ribo.uq.sorted.rRNAfiltered.rtrimfilterd.25-35.final.bam']
 
@@ -163,7 +165,7 @@ def main():
     FileIn = gzip.GzipFile(annoPklz, 'rb')
     (gene_id, gene_name, gene_biotype, chr, gene_region, gene_strand, transc_id, transc_type, transc, cds, utr5, utr3) = pickle.load(FileIn)
     FileIn.close()
-    print 'Load annotation done.'
+    print 'Load annotation: done.'
 
     FileIn = open(geneList, 'r')
     FileOut = open(outputFile, 'w')
@@ -230,7 +232,6 @@ def main():
             if Strand == '-':
                 covRegion_B = covRegion_B[::-1]
 
-            cutoff = 3
             covRegionDiff = get_diff(covRegion_A, covRegion_B, cutoff)
 
             FileOut.write('>%s|%s|%s\n' % (geneID, transcID, geneName))
