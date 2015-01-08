@@ -132,8 +132,8 @@ def get_unique_global_pos(rdGQ_ALL_POS, rdGQ_COV_POS, rdGQ_INC_POS, rdFLK5P_COV_
 def main():
 
     annoPklz = '/cbio/grlab/share/databases/genomes/H_sapiens/Homo_sapiens.GRCh37.ENSEMBL75/annotation/Homo_sapiens.GRCh37.75.primary_assembly.anno.pklz'
-    covDiffFile = '/cbio/grlab/projects/RibosomeFootprint/CovChange/SilTEup.prot.5p.utr5.all.cutoff3.covdiff'
-    gqPklz = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTEup.prot.5p.utr5.all.cutoff3.gq'
+    covDiffFile = '/cbio/grlab/projects/RibosomeFootprint/CovChange/SilTEdown.prot.5p.utr5.all.cutoff3.covdiff'
+    gqPklz = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTEdown.prot.5p.utr5.all.cutoff3.gq'
     FLK = 40.0
 
     FileIn = gzip.GzipFile(annoPklz, 'rb')

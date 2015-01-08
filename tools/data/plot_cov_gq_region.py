@@ -65,7 +65,7 @@ def do_plot(COVDIFFdown, COVDIFFup, destLengthGQ, LengthFLK, FileOutName):
     ax.plot(X, COVDIFFup, color='skyblue', linestyle='-', label='TE Up')
 
     ax.set_xlim(0, COVDIFFdown.size + 1)
-    ax.set_ylim(0.6, 1.8)
+    #ax.set_ylim(0.6, 1.8)
     ax.legend(loc='upper right', handlelength=3, prop={'size':9})
 
     ymin, ymax = plt.ylim()
@@ -164,25 +164,25 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
 
 if __name__ == '__main__':
 
-    outputTxt = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.cutoff4.txt'
-    outputPdf = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.cutoff4.pdf'
+    outputTxt = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.cutoff6.txt'
+    outputPdf = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.cutoff6.pdf'
     destLengthGQ = 30.0
     LengthFLK = 40.0
 
-    #geneList = '/cbio/grlab/projects/RibosomeFootprint/Lists/SilTEdown.prot.5p.txt'
-    #gqPklz = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTEdown.prot.5p.utr5.all.cutoff3.gq'
-    #COVDIFF_Down = get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK)
+    geneList = '/cbio/grlab/projects/RibosomeFootprint/Lists/SilTEdown.prot.5p.txt'
+    gqPklz = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTEdown.prot.5p.utr5.all.cutoff3.gq'
+    COVDIFF_Down = get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK)
 
-    #geneList = '/cbio/grlab/projects/RibosomeFootprint/Lists/SilTEup.prot.5p.txt'
-    #gqPklz = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTEup.prot.5p.utr5.all.cutoff3.gq'
-    #COVDIFF_Up = get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK)
+    geneList = '/cbio/grlab/projects/RibosomeFootprint/Lists/SilTEup.prot.5p.txt'
+    gqPklz = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTEup.prot.5p.utr5.all.cutoff3.gq'
+    COVDIFF_Up = get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK)
 
-    #column1 = np.arange(1, COVDIFF_Down.size+1).reshape((COVDIFF_Down.size, 1)).astype(int).astype(str)
-    #column2 = COVDIFF_Down.reshape((COVDIFF_Down.size, 1)).astype(str)
-    #column3 = COVDIFF_Up.reshape((COVDIFF_Up.size, 1)).astype(str)
-    #outNdarray = np.hstack([column1, column2, column3])
-    #np.savetxt(outputTxt, outNdarray, fmt='%s', delimiter='\t', comments='')
-    #print 'Save file: done.'
+    column1 = np.arange(1, COVDIFF_Down.size+1).reshape((COVDIFF_Down.size, 1)).astype(int).astype(str)
+    column2 = COVDIFF_Down.reshape((COVDIFF_Down.size, 1)).astype(str)
+    column3 = COVDIFF_Up.reshape((COVDIFF_Up.size, 1)).astype(str)
+    outNdarray = np.hstack([column1, column2, column3])
+    np.savetxt(outputTxt, outNdarray, fmt='%s', delimiter='\t', comments='')
+    print 'Save file: done.'
 
     COVDIFF_Down = np.loadtxt(outputTxt, dtype=float, skiprows=0, delimiter='\t', usecols=(1,))
     COVDIFF_Up   = np.loadtxt(outputTxt, dtype=float, skiprows=0, delimiter='\t', usecols=(2,))
