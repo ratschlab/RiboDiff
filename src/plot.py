@@ -149,7 +149,7 @@ def empDisp_scatter(data, fileOutName):
     ax.text(0.03, 0.96, r'$\sigma_{Ribo\/}=%1.2f$' % stdDispRibo, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
     ax.text(0.03, 0.92, r'$\sigma_{RNA}=%1.2f$' % stdDispRna, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
 
-    plt.savefig(fileOutName, format='pdf')
+    plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
 def empDisp_hist(data, fileOutName):
 
@@ -197,14 +197,14 @@ def empDisp_hist(data, fileOutName):
     ax.tick_params(axis='x', labelsize=10)
     ax.tick_params(axis='y', labelsize=10)
 
-    ax.set_xlabel(r'$log_{10}\alpha_{Ribo}-log_{10}\alpha_{RNA}$', fontsize=15)
+    ax.set_xlabel(r'$log_{10}\kappa_{RF}\,-\,log_{10}\kappa_{RNA}$', fontsize=15)
     ax.set_title(r'Distribution of dispersion difference')
 
     ax.text(0.88, 0.96, r'$n=%i$' % num, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
     ax.text(0.88, 0.92, r'$\mu=%1.2f$' % meanDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
     ax.text(0.88, 0.88, r'$\sigma=%1.2f$' % stdDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
 
-    plt.savefig(fileOutName, format='pdf')
+    plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
 def cnt_deltaTE_scatter(data, fileOutName):
 
@@ -248,7 +248,7 @@ def cnt_deltaTE_scatter(data, fileOutName):
     ax.set_xlabel(r'$Mean\/count\/of\/Ribo-Seq$', fontsize=15)
     ax.set_ylabel(r'$log_{2}(TE_{conditionB}/TE_{conditionA})$', fontsize=15)
 
-    plt.savefig(fileOutName, format='pdf')
+    plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
 def make_plots(data, opts):
 
