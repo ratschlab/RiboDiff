@@ -2,11 +2,11 @@
 
 import sys
 import numpy as np
+import re
 
 class LoadInputs(object):
 
-    """ Read the experiment description file, and use it to guide reading gene count file. 
-        Store all data as a class object containing relative attributes """
+    """ Read the experiment description file, and use it to guide reading gene count file. """
 
     def __init__(self, opts):
         self.fileNameExper = opts.exptOutline
@@ -65,17 +65,42 @@ class LoadInputs(object):
         self.experiment = np.loadtxt(self.fileNameExper, dtype=str, delimiter=',', skiprows=1)
         self.exper = self.experiment.copy()
 
-        # add codes to make it case insensative
-        idxRibo = self.exper[:, 1] == 'Ribo-Seq'
-        idxRna  = self.exper[:, 1] == 'RNA-Seq'
-        idxCtl  = self.exper[:, 2] == 'ConditionA'
-        idxTrt  = self.exper[:, 2] == 'ConditionB'
+        seqType = np.unique(self.exper[:, 1])
+        if seqType.size != 2:
+            sys.stderr.write('Error: only two types of sequencing keyword are allowed. Please check the second column in experimental outline file.\n')
+            sys.exit()
+        for eachSeqType in seqType.tolist():
+            if re.search(r'^Ribo-Seq$', eachSeqType, re.I):
+                idxRibo = self.exper[:, 1] == eachSeqType
+            if re.search(r'^RNA-Seq$', eachSeqType, re.I):
+                idxRna = self.exper[:, 1] == eachSeqType
+        try:
+            idxRibo
+        except NameError:
+            sys.stderr.write('Error: in the second column in experimental outline file, please use \'Ribo-Seq\' to indicate which replicates are ribosome profiling data.\n')
+            sys.exit()
+
+        try:
+            idxRna
+        except NameError:
+            sys.stderr.write('Error: in the second column in experimental outline file, please use \'RNA-Seq\' to indicate which replicates are RNA-Seq data.\n')
+            sys.exit()
+
+        condition, condIdx = np.unique(self.exper[:, 2], return_index=True)
+        if condition.size != 2:
+            sys.stderr.write('Error: only two conditions are allowed. Please check the last column in experimental outline file.\n')
+            sys.exit()
+        if condIdx[0] == 0:
+            idxCtl = self.exper[:, 2] == condition[0]
+            idxTrt = self.exper[:, 2] == condition[1]
+        else:
+            idxCtl = self.exper[:, 2] == condition[1]
+            idxTrt = self.exper[:, 2] == condition[0]
 
         self.exper[idxRibo,1] = 'Ribo'
         self.exper[idxRna, 1] = 'mRna'
-        self.exper[idxCtl, 2] = 'Control'
-        self.exper[idxTrt, 2] = 'Treated'
-        #
+        self.exper[idxCtl, 2] = 'ConditionA'
+        self.exper[idxTrt, 2] = 'ConditionB'
 
         self.experRibo = self.exper[idxRibo,0]
         self.experRna  = self.exper[idxRna, 0]
@@ -91,12 +116,14 @@ class LoadInputs(object):
         with open(self.fileNameCount, 'r') as FileIn:
             header = np.array(FileIn.readline().strip().split('\t'), dtype=str)
 
-        # add codes to dectect if the column name in the header of the count file agree with that in Experiment Outline File 
         idxRibo = np.in1d(header, self.experRibo).nonzero()[0]
         idxRna  = np.in1d(header, self.experRna ).nonzero()[0]
         idxCtl  = np.in1d(header, self.experCtl ).nonzero()[0]
         idxTrt  = np.in1d(header, self.experTrt ).nonzero()[0]
-        #
+
+        if idxRibo.size != self.experRibo.size or idxRna.size != self.experRna.size or idxCtl.size != self.experCtl.size or idxTrt.size != self.experTrt:
+            sys.stderr.write('Error: At least one sample or replicate\'s name in count file and experimental outline file does not match.\n')
+            sys.exit()
 
         idxRiboCtl = np.intersect1d(idxRibo, idxCtl)
         idxRiboTrt = np.intersect1d(idxRibo, idxTrt)
