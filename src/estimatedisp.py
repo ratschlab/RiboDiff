@@ -6,9 +6,10 @@ import cPickle as pickle
 
 def estimate_disp(data, opts):
 
+    """ Create explanatory matrix and estimate dispersion. 
+        Temporarily save data in ./TmpData.pkl file """
+
     explanatory = cm.create_matrix(data, model='H1')
-    #import statsmodels.api as sm
-    #explanatory = sm.add_constant(explanatory, prepend=False)
     data.matrix = explanatory
 
     outpath = opts.resPath

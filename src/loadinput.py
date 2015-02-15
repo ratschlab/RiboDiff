@@ -17,6 +17,8 @@ class LoadInputs(object):
         self.experRna  = np.empty([1, 1], dtype='str')
         self.experCtl  = np.empty([1, 1], dtype='str')
         self.experTrt  = np.empty([1, 1], dtype='str')
+        self.nameConA  = np.empty([1, 1], dtype='str')
+        self.nameConB  = np.empty([1, 1], dtype='str')
         self.idxRibo = np.empty([1, 1], dtype='int')
         self.idxRna  = np.empty([1, 1], dtype='int')
         self.idxCtl  = np.empty([1, 1], dtype='int')
@@ -93,9 +95,13 @@ class LoadInputs(object):
         if condIdx[0] == 0:
             idxCtl = self.exper[:, 2] == condition[0]
             idxTrt = self.exper[:, 2] == condition[1]
+            self.nameCondA = condition[0]
+            self.nameCondB = condition[1]
         else:
             idxCtl = self.exper[:, 2] == condition[1]
             idxTrt = self.exper[:, 2] == condition[0]
+            self.nameCondA = condition[1]
+            self.nameCondB = condition[0]
 
         self.exper[idxRibo,1] = 'Ribo'
         self.exper[idxRna, 1] = 'mRna'
@@ -121,7 +127,7 @@ class LoadInputs(object):
         idxCtl  = np.in1d(header, self.experCtl ).nonzero()[0]
         idxTrt  = np.in1d(header, self.experTrt ).nonzero()[0]
 
-        if idxRibo.size != self.experRibo.size or idxRna.size != self.experRna.size or idxCtl.size != self.experCtl.size or idxTrt.size != self.experTrt:
+        if idxRibo.size != self.experRibo.size or idxRna.size != self.experRna.size or idxCtl.size != self.experCtl.size or idxTrt.size != self.experTrt.size:
             sys.stderr.write('Error: At least one sample or replicate\'s name in count file and experimental outline file does not match.\n')
             sys.exit()
 

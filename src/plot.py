@@ -6,7 +6,6 @@ import cPickle as pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from optparse import OptionParser, OptionGroup
-import pdb
 
 def parse_options(argv):
 
@@ -85,20 +84,20 @@ def empDisp_scatter(data, fileOutName):
     for i in np.arange(minCnt, maxCnt, winSize):
         IDX1 = np.logical_and(np.logical_and(np.log2(cntRiboMean) > i, np.log2(cntRiboMean) < i + winSize), dispRibo > 0).nonzero()[0]
         IDX2 = np.logical_and(np.logical_and(np.log2(cntRnaMean)  > i, np.log2(cntRnaMean)  < i + winSize), dispRna  > 0).nonzero()[0]
-        if i + winSize / 2.0 >= np.percentile(np.log2(cntRiboMean), 1.0) and i + winSize / 2.0 <= np.percentile(np.log2(cntRiboMean), 99.0):
+        if i + winSize / 2.0 >= np.percentile(np.log2(cntRiboMean), 2.5) and i + winSize / 2.0 <= np.percentile(np.log2(cntRiboMean), 97.5):
             dispWinMedRibo.extend([np.median(dispRibo[IDX1])])
             cntWinRibo.extend([i + winSize / 2.0])
-        if i + winSize / 2.0 >= np.percentile(np.log2(cntRnaMean), 1.0) and i + winSize / 2.0 <= np.percentile(np.log2(cntRnaMean), 99.0):
+        if i + winSize / 2.0 >= np.percentile(np.log2(cntRnaMean), 2.5) and i + winSize / 2.0 <= np.percentile(np.log2(cntRnaMean), 97.5):
             dispWinMedRna.extend([np.median(dispRna[IDX2])])
             cntWinRna.extend([i + winSize / 2.0])
 
     fig, ax = plt.subplots()
 
-    ax.scatter(np.log2(cntRnaMean[dispRna   > 0]), np.log10(dispRna[dispRna   > 0]), marker='o', color='lightsalmon',  s=0.5, lw=0, label='RNA-Seq' )
-    ax.scatter(np.log2(cntRiboMean[dispRibo > 0]), np.log10(dispRibo[dispRibo > 0]), marker='o', color='lightskyblue', s=0.5, lw=0, label='Ribo-Seq')
+    ax.scatter(np.log2(cntRnaMean[dispRna   > 0]), np.log10(dispRna[dispRna   > 0]), marker='o', color='lightsalmon',  s=0.5, lw=0, label='dispersion, RNA-Seq' )
+    ax.scatter(np.log2(cntRiboMean[dispRibo > 0]), np.log10(dispRibo[dispRibo > 0]), marker='o', color='lightskyblue', s=0.5, lw=0, label='dispersion, Ribo-Seq')
 
-    ax.plot(cntWinRna,  np.log10(dispWinMedRna),  color='tomato', linestyle='-', marker='^', markersize=4, markeredgewidth=0, label='RNA-Seq, trend' )
-    ax.plot(cntWinRibo, np.log10(dispWinMedRibo), color='blue',   linestyle='-', marker='*', markersize=5, markeredgewidth=0, label='Ribo-Seq, trend')
+    ax.plot(cntWinRna,  np.log10(dispWinMedRna),  color='tomato', linestyle='-', marker='^', markersize=4, markeredgewidth=0, label='window mean, RNA-Seq' )
+    ax.plot(cntWinRibo, np.log10(dispWinMedRibo), color='blue',   linestyle='-', marker='*', markersize=5, markeredgewidth=0, label='window mean, Ribo-Seq')
 
     smallestDisp = min(np.hstack([np.log10(dispRna[dispRna > 0]), np.log10(dispRibo[dispRibo > 0])]))
     largestDisp  = max(np.hstack([np.log10(dispRna[dispRna > 0]), np.log10(dispRibo[dispRibo > 0])]))
@@ -146,8 +145,8 @@ def empDisp_scatter(data, fileOutName):
     ax.set_ylabel(r'$log_{10}(dispersion)$', fontsize=15)
     ax.set_title('Empirical dispersion')
 
-    ax.text(0.03, 0.96, r'$\sigma_{Ribo\/}=%1.2f$' % stdDispRibo, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
-    ax.text(0.03, 0.92, r'$\sigma_{RNA}=%1.2f$' % stdDispRna, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
+    ax.text(0.03, 0.96, r'$\sigma_{Ribo\/}=\,%1.2f$' % stdDispRibo, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
+    ax.text(0.03, 0.92, r'$\sigma_{RNA}=\,%1.2f$' % stdDispRna, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
 
     plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
@@ -198,11 +197,11 @@ def empDisp_hist(data, fileOutName):
     ax.tick_params(axis='y', labelsize=10)
 
     ax.set_xlabel(r'$log_{10}\kappa_{RF}\,-\,log_{10}\kappa_{RNA}$', fontsize=15)
-    ax.set_title(r'Distribution of dispersion difference')
+    ax.set_title(r'Histogram of dispersion difference')
 
-    ax.text(0.88, 0.96, r'$n=%i$' % num, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
-    ax.text(0.88, 0.92, r'$\mu=%1.2f$' % meanDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
-    ax.text(0.88, 0.88, r'$\sigma=%1.2f$' % stdDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=11)
+    ax.text(0.86, 0.96, r'$n\,=\,%i$' % num, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
+    ax.text(0.86, 0.92, r'$\mu\,=\,%1.2f$' % meanDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
+    ax.text(0.86, 0.88, r'$\sigma\,=\,%1.2f$' % stdDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
 
     plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
@@ -234,10 +233,8 @@ def cnt_deltaTE_scatter(data, fileOutName):
     xLowerBound = (np.percentile(cntRiboMean, 99.0) - min(cntRiboMean)) * -0.02
     xUpperBound = np.percentile(cntRiboMean, 99.0)
 
-    ax.set_xlim(-30, 1300)
-    ax.set_ylim(-2.5, 2.5)
-    #ax.set_xlim(xLowerBound, xUpperBound)
-    #ax.set_ylim(np.percentile(logFoldChangeTE, 0.5), np.percentile(logFoldChangeTE, 99.5))
+    ax.set_xlim(xLowerBound, xUpperBound)
+    ax.set_ylim(np.percentile(logFoldChangeTE, 0.5), np.percentile(logFoldChangeTE, 99.5))
 
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().tick_left()
@@ -246,7 +243,7 @@ def cnt_deltaTE_scatter(data, fileOutName):
 
     ax.set_title(r'TE fold change')
     ax.set_xlabel(r'$Mean\/count\/of\/Ribo-Seq$', fontsize=15)
-    ax.set_ylabel(r'$log_{2}(TE_{conditionB}/TE_{conditionA})$', fontsize=15)
+    ax.set_ylabel(r'$log_{2}(TE_{%s}/TE_{%s})$' % (data.nameCondB, data.nameCondA), fontsize=15)
 
     plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
@@ -264,7 +261,7 @@ def make_plots(data, opts):
     fileOutName = outputNamePrefix + '.EmpDisp.hist.pdf'
     empDisp_hist(data, fileOutName)
 
-    fileOutName = outputNamePrefix + 'Cnt-DeltaTE.scatter.pdf'
+    fileOutName = outputNamePrefix + '.Cnt-DeltaTE.scatter.pdf'
     cnt_deltaTE_scatter(data, fileOutName)
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 import numpy as np
 import statsmodels.api as sm
-import pdb
 
 def do_fitting(data, obj):
 
@@ -21,31 +20,19 @@ def do_fitting(data, obj):
     dispRawMthd = data.dispRawMthd
     beta = np.array([0.1, 0.01])
 
-    iter = 10
+    iter = 5
 
     if obj == 'RR':
         index = np.nonzero(dispRawConv == True)[0]
-        lowerBound = np.percentile(np.unique(dispRaw[index]),  1)
-        upperBound = np.percentile(np.unique(dispRaw[index]), 99)
     else:
         index = np.logical_and(dispRawConv == True, dispRawMthd != 'Bounded').nonzero()[0]
-        #lowerBound = mode(dispRaw[index])[0][0]
-        lowerBound = np.percentile(np.unique(dispRaw[index]),  1)
-        upperBound = np.percentile(np.unique(dispRaw[index]), 99)
+
+    lowerBound = np.percentile(np.unique(dispRaw[index]),  1)
+    upperBound = np.percentile(np.unique(dispRaw[index]), 99)
 
     idx = np.logical_and(dispRaw > lowerBound, dispRaw < upperBound).nonzero()[0]
 
     for i in range(iter):
-
-        #ratioForBound = dispRaw[idx] / (beta[0] / countMean[idx] + beta[1])
-
-        #pdb.set_trace()
-       
-        #lowerBound = np.percentile(ratioForBound[~np.isnan(ratioForBound)], 5)
-        #upperBound = np.percentile(ratioForBound[~np.isnan(ratioForBound)], 95)
-
-        #ratio = dispRaw / (beta[0] / countMean + beta[1])
-        #idx = np.logical_and(ratio > lowerBound, ratio < upperBound)
 
         matrix = np.empty((idx.size, 2))
         matrix.fill(np.nan)

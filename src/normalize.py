@@ -10,10 +10,11 @@ def usage():
 
 def lib_size(countNdarray):
 
-    """ Calculate library size: median( gene[i] cnt / geometric mean[i] across all libraries ) """
+    """ Calculate library size """
 
-    # add code to check if there are counts smaller than zero
-    #
+    if np.any(countNdarray < 0, axis=None):
+        sys.stderr.write('Error: read count smaller than one is detected, please check input file.\n')
+        sys.exit()
 
     countNdarrayTmp = countNdarray.copy()
     countNdarrayTmp = countNdarrayTmp + 1

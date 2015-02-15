@@ -72,6 +72,7 @@ def adj_pval(data, opts):
         method = 'tsbh'
     else:
         sys.stderr.write('ERROR: The methods for multiple test correction can only accept \'Bonferroni\', \'Holm\', \'Hochberg\', \'Hommel\', \'BH\', \'BY\' or \'TSBH\' as its input.\n')
+        sys.exit()
 
     mtc = sms.stats.multicomp.multipletests(pval[idx], alpha=0.1, method=method, returnsorted=False)
 
@@ -83,20 +84,30 @@ def adj_pval(data, opts):
 
 def cal_TEchange(data):
 
-    const = 1e-5
+    const = 1.0
 
     count = np.hstack([data.countRibo, data.countRna])
     libSizes = np.hstack([data.libSizesRibo, data.libSizesRna])
 
     idxRiboCtl = np.intersect1d(data.idxRibo, data.idxCtl)
     idxRnaCtl  = np.intersect1d(data.idxRna,  data.idxCtl)
-    TEctl = (const + np.mean((count/libSizes)[:, idxRiboCtl], axis=1)) / (const + np.mean((count/libSizes)[:, idxRnaCtl], axis=1))
+    meanRiboCtl = np.mean((count/libSizes)[:, idxRiboCtl], axis=1)
+    meanRnaCtl  = np.mean((count/libSizes)[:, idxRnaCtl], axis=1)
+    idxC = np.logical_or(meanRiboCtl == 0.0, meanRnaCtl == 0.0)
+    meanRiboCtl[idxC] = meanRiboCtl[idxC] + const
+    meanRnaCtl[idxC]  = meanRnaCtl[idxC]  + const
+    TEctl = meanRiboCtl / meanRnaCtl
     TEctl = np.reshape(TEctl, (TEctl.size, 1))
     data.TEctl = TEctl
 
     idxRiboTrt = np.intersect1d(data.idxRibo, data.idxTrt)
     idxRnaTrt  = np.intersect1d(data.idxRna,  data.idxTrt)
-    TEtrt = (const + np.mean((count/libSizes)[:, idxRiboTrt], axis=1)) / (const + np.mean((count/libSizes)[:, idxRnaTrt], axis=1))
+    meanRiboTrt = np.mean((count/libSizes)[:, idxRiboTrt], axis=1)
+    meanRnaTrt  = np.mean((count/libSizes)[:, idxRnaTrt], axis=1)
+    idxT = np.logical_or(meanRiboTrt == 0.0, meanRnaTrt == 0.0)
+    meanRiboTrt[idxT] = meanRiboTrt[idxT] + const
+    meanRnaTrt[idxT]  = meanRnaTrt[idxT]  + const
+    TEtrt = meanRiboTrt / meanRnaTrt
     TEtrt = np.reshape(TEtrt, (TEtrt.size, 1))
     data.TEtrt = TEtrt
 

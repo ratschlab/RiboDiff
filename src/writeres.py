@@ -8,41 +8,25 @@ def write_result(data, opts):
     padj = data.padj.astype(str)
     TEctl = data.TEctl.astype(str)
     TEtrt = data.TEtrt.astype(str)
+    nameCondA = data.nameCondA
+    nameCondB = data.nameCondB
     logFoldChangeTE = data.logFoldChangeTE.astype(str)
-    countRibo = np.around(data.countRibo / data.libSizesRibo).astype(str)
-    countRna  = np.around(data.countRna  / data.libSizesRna ).astype(str)
-    sampleNameRibo = '\t'.join(data.headerRibo.tolist())
-    sampleNameRna  = '\t'.join(data.headerRna.tolist())
 
     if opts.dispDiff:
-        dispRawRibo = data.dispRawRibo.astype(str)
-        dispRawRna  = data.dispRawRna.astype(str)
-        dispRawMthd = data.dispRawMthd.astype(str)
-        dispRawConv = data.dispRawConv.astype(str)
-        dispRawConv[dispRawConv=='1.0'] = 'Y'
-        dispRawConv[dispRawConv=='0.0'] = 'N'
-        dispFittedRibo = data.dispFittedRibo.astype(str)
-        dispFittedRna  = data.dispFittedRna.astype(str)
         dispAdjRibo = data.dispAdjRibo.astype(str)
         dispAdjRna  = data.dispAdjRna.astype(str)
-        dispAdjMthd = data.dispAdjMthd.astype(str)
         dispAdjConv = data.dispAdjConv.astype(str)
         dispAdjConv[dispAdjConv=='1.0'] = 'Y'
         dispAdjConv[dispAdjConv=='0.0'] = 'N'
-        outNdarrayUnsorted = np.hstack([geneIDs, dispRawRibo, dispRawRna, dispRawMthd, dispRawConv, dispFittedRibo, dispFittedRna, dispAdjRibo, dispAdjRna, dispAdjMthd, dispAdjConv, pval, padj, TEctl, TEtrt, logFoldChangeTE, countRibo, countRna])
-        header = 'geneIDs\tdisperRawRibo\tdisperRawRNA\tdisperRawMthd\tdisperRawConverge\tdisperFittedRibo\tdisperFittedRNA\tdisperAdjRibo\tdisperAdjRNA\tdisperAdjMthd\tdisperAdjConverge\tpval\tpadj\tTEctl\tTEtrt\tlog2FoldChangeTE\t' + sampleNameRibo + '\t' + sampleNameRna
+        outNdarrayUnsorted = np.hstack([geneIDs, dispAdjRibo, dispAdjRna, dispAdjConv, pval, padj, TEctl, TEtrt, logFoldChangeTE])
+        header = 'geneIDs\tdisperRibo\tdisperRNA\tdisperConv\tpval\tpadj\tTE%s\tTE%s\tlog2FC_TE(%s vs %s)\t' % (nameCondA, nameCondB, nameCondB, nameCondA)
     else:
-        dispRaw = data.dispRaw.astype(str)
-        dispRawConv = data.dispRawConv.astype(str)
-        dispRawConv[dispRawConv=='1.0'] = 'Y'
-        dispRawConv[dispRawConv=='0.0'] = 'N'
-        dispFitted = data.dispFitted.astype(str)
         dispAdj = data.dispAdj.astype(str)
         dispAdjConv = data.dispAdjConv.astype(str)
         dispAdjConv[dispAdjConv=='1.0'] = 'Y'
         dispAdjConv[dispAdjConv=='0.0'] = 'N'
-        outNdarrayUnsorted = np.hstack([geneIDs, dispRaw, dispRawConv, dispFitted, dispAdj, dispAdjConv, pval, padj, TEctl, TEtrt, logFoldChangeTE, countRibo, countRna])
-        header = 'geneIDs\tdisperRaw\tdisperRawConverge\tdisperFitted\tdisperAdj\tdisperAdjConverge\tpval\tpadj\tTEctl\tTEtrt\tlog2FoldChangeTE\t' + sampleNameRibo + '\t' + sampleNameRna
+        outNdarrayUnsorted = np.hstack([geneIDs, dispAdj, dispAdjConv, pval, padj, TEctl, TEtrt, logFoldChangeTE])
+        header = 'geneIDs\tdisper\tdisperConv\tpval\tpadj\tTE%s\tTE%s\tlog2FC_TE(%s vs %s)\t' % (nameCondA, nameCondB, nameCondB, nameCondA)
 
     if opts.rankResult == 0:
         outNdarray = outNdarrayUnsorted.copy()
