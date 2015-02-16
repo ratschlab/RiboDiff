@@ -20,6 +20,7 @@ def parse_options(argv):
     optional.add_option('-m', action='store', type='string', dest='multiTest', default='BH', help='Method for multiple test correction. Options: BH (Benjamini-Hochberg); Bonferroni. [default: BH]')
     optional.add_option('-r', action='store', type='int', dest='rankResult', default=0, help='Rank the result table in ascending order by a specific column. Adjusted p value: 1; TE change: 2; Gene id: 3; Keep the order as in count file: 0. [default: 0]')
     optional.add_option('-p', action='store', type='int', dest='plots', default=0, help='Make plots to show the data and results. Plots are in pdf format. On: 1; Off: 0. [default: 0]')
+    optional.add_option('-q', action='store', type='float', dest='cutoffFDR', default=0.1, help='Set the FDR cutoff for significant case to plot. [default: 0.1]')
 
     parser.add_option_group(required)
     parser.add_option_group(optional)
@@ -51,10 +52,10 @@ def parse_options(argv):
     if opts.dispDiff not in [0, 1]:
         parser.error('-d option can only take either 0 or 1 as argument.\n')
 
-    if opts.sumCntCutoff < 1:
-        parser.error('-s option cannot take valuse smaller than 1 as argument.\n')
+    if opts.sumCntCutoff < 1.0:
+        parser.error('-s option cannot take values smaller than 1 as argument.\n')
 
-    if opts.dispInitial <= 0:
+    if opts.dispInitial <= 0.0:
         parser.error('-i option can only take positive value as argument.\n')
 
     if opts.multiTest not in ['BH', 'Bonferroni', 'Holm', 'Hochberg', 'Hommel', 'BY', 'TSBH']:
@@ -65,6 +66,9 @@ def parse_options(argv):
 
     if opts.plots not in [0, 1]:
         parser.error('-p option can only take either 0 or 1 as argument.\n')
+
+    if opts.cutoffFDR < 0.0 or opts.cutoffFDR > 1.0:
+        parser.error('-q option can oly take values between zero and one.\n')
 
     return opts
 
