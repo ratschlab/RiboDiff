@@ -142,13 +142,16 @@ def cal_TPR_FPR_babel(simFileName, babelFileName):
 
     return (TPR, FPR)
 
-def plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFigName):
+#def plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFigName):
+def plot_roc(TPR2, FPR2, TPR3, FPR3, rocFigName):
 
     fig, ax = plt.subplots()
 
-    ax.plot(FPR1, TPR1, linestyle='-', color='tomato', label='Single dispersion')
-    ax.plot(FPR2, TPR2, linestyle='-', color='skyblue', label='Two dispersions')
-    ax.plot(FPR3, TPR3, linestyle='-', color='orange', label='babel')
+    #ax.plot(FPR1, TPR1, linestyle='-', color='tomato', label='Single dispersion')
+    #ax.plot(FPR2, TPR2, linestyle='-', color='skyblue', label='Two dispersions')
+    #ax.plot(FPR3, TPR3, linestyle='-', color='orange', label='babel')
+    ax.plot(FPR2, TPR2, linestyle='-', color='tomato', label='RiboDiff')
+    ax.plot(FPR3, TPR3, linestyle='-', color='skyblue', label='babel')
 
     ax.legend(loc='lower right', prop={'size':11})
 
@@ -165,55 +168,57 @@ def plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFigName):
 
 if __name__ == '__main__':
 
-    simFileName1 = '../exp/Sim/Sim.Ribo.Rep3.G2K.Diff1K.Sh1.5.Sc0.5.cnt.txt'
-    simFileName2 = '../exp/Sim/Sim.Rna.Rep3.G2K.Diff1K.Sh1.5.Sc0.5.cnt.txt'
-    simFileName3 = '../exp/Sim/Sim.Ribo.Rep3.G2K.Diff1K.Sh0.8.Sc0.5.cnt.txt'
-    simFileName4 = '../exp/Sim/Sim.Rna.Rep3.G2K.Diff1K.Sh0.6.Sc0.5.cnt.txt'
+    #simFileName1 = '../exp/Sim/Sim.Ribo.Rep3.G2K.Diff1K.Sh1.5.Sc0.5.cnt.txt'
+    #simFileName2 = '../exp/Sim/Sim.Rna.Rep3.G2K.Diff1K.Sh1.5.Sc0.5.cnt.txt'
+    #simFileName3 = '../exp/Sim/Sim.Ribo.Rep3.G2K.Diff1K.Sh0.8.Sc0.5.cnt.txt'
+    #simFileName4 = '../exp/Sim/Sim.Rna.Rep3.G2K.Diff1K.Sh0.6.Sc0.5.cnt.txt'
     simFileName5 = '../exp/Sim/Sim.Ribo.Rep3.G2K.Diff1K.Sh0.8.Sc0.5.cnt.txt'
 
-    resTEtest1 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRb.Sh1.5.Sc0.5.res0.pkl'
-    resTEtest2 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRna.Sh1.5.Sc0.5.res0.pkl'
-    resTEtest3 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRb.Sh0.8.Sc0.5.res0.pkl'
-    resTEtest4 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRna.Sh0.6.Sc0.5.res0.pkl'
-    resTEtest5 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRbRna.Sh0.8Rb.Sh0.6Rna.Sc0.5.res0.pkl'
+    #resTEtest1 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRb.Sh1.5.Sc0.5.res0.pkl'
+    #resTEtest2 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRna.Sh1.5.Sc0.5.res0.pkl'
+    #resTEtest3 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRb.Sh0.8.Sc0.5.res0.pkl'
+    #resTEtest4 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRna.Sh0.6.Sc0.5.res0.pkl'
+    #resTEtest5 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRbRna.Sh0.8Rb.Sh0.6Rna.Sc0.5.res0.pkl'
 
-    snspFigName = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1K.SnSp.res0.pdf'
+    #snspFigName = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1K.SnSp.res0.pdf'
 
-    with open(resTEtest1, 'rb') as FileIn:
-        data1 = pickle.load(FileIn)
-    with open(resTEtest2, 'rb') as FileIn:
-        data2 = pickle.load(FileIn)
-    with open(resTEtest3, 'rb') as FileIn:
-        data3 = pickle.load(FileIn)
-    with open(resTEtest4, 'rb') as FileIn:
-        data4 = pickle.load(FileIn)
-    with open(resTEtest5, 'rb') as FileIn:
-        data5 = pickle.load(FileIn)
+    #with open(resTEtest1, 'rb') as FileIn:
+    #    data1 = pickle.load(FileIn)
+    #with open(resTEtest2, 'rb') as FileIn:
+    #    data2 = pickle.load(FileIn)
+    #with open(resTEtest3, 'rb') as FileIn:
+    #    data3 = pickle.load(FileIn)
+    #with open(resTEtest4, 'rb') as FileIn:
+    #    data4 = pickle.load(FileIn)
+    #with open(resTEtest5, 'rb') as FileIn:
+    #    data5 = pickle.load(FileIn)
 
-    print 'Start SN1, SP1'
-    SN1, SP1, P1 = cal_SN_SP(simFileName1, data1)
-    print 'Start SN2, SP2'
-    SN2, SP2, P2 = cal_SN_SP(simFileName2, data2)
-    print 'Start SN3, SP3'
-    SN3, SP3, P3 = cal_SN_SP(simFileName3, data3)
-    print 'Start SN4, SP4'
-    SN4, SP4, P4 = cal_SN_SP(simFileName4, data4)
-    print 'Start SN5, SP5'
-    SN5, SP5, P5 = cal_SN_SP(simFileName5, data5)
-    plot_sn_sp(SN1, SP1, P1, SN2, SP2, P2, SN3, SP3, P3, SN4, SP4, P4, SN5, SP5, P5, snspFigName)
-    print 'plot SN SP: Done!\n'
+    #print 'Start SN1, SP1'
+    #SN1, SP1, P1 = cal_SN_SP(simFileName1, data1)
+    #print 'Start SN2, SP2'
+    #SN2, SP2, P2 = cal_SN_SP(simFileName2, data2)
+    #print 'Start SN3, SP3'
+    #SN3, SP3, P3 = cal_SN_SP(simFileName3, data3)
+    #print 'Start SN4, SP4'
+    #SN4, SP4, P4 = cal_SN_SP(simFileName4, data4)
+    #print 'Start SN5, SP5'
+    #SN5, SP5, P5 = cal_SN_SP(simFileName5, data5)
+    #plot_sn_sp(SN1, SP1, P1, SN2, SP2, P2, SN3, SP3, P3, SN4, SP4, P4, SN5, SP5, P5, snspFigName)
+    #print 'plot SN SP: Done!\n'
 
     babelFileName = '../exp/Sim/Sim.RnaRibo.Rep3.G2K.Diff1K.Sh0.8Rb.Sh0.6Rna.Sc0.5.res.babel.txt'
-    rocFigName = '../exp/Sim/Sim.Rep3.G2K.Diff1KRbRna.Sh0.8Rb.Sh0.6Rna.Sc0.5.roc.pdf'
+    #rocFigName = '../exp/Sim/Sim.Rep3.G2K.Diff1KRbRna.Sh0.8Rb.Sh0.6Rna.Sc0.5.roc.pdf'
+    rocFigName = '../exp/Sim/Sim.Rep3.G2K.Diff1KRbRna.Sh0.8Rb.Sh0.6Rna.Sc0.5.roc2.pdf'
     resTEtest6 = '../exp/Sim/Sim.Merged.Rep3.G2K.Diff1KRbRna.Sh0.8Rb.Sh0.6Rna.Sc0.5.res1.pkl'
     with open(resTEtest6, 'rb') as FileIn:
         data6 = pickle.load(FileIn)
 
-    print 'Start TPR1, FPR1'
-    TPR1, FPR1 = cal_TPR_FPR(simFileName5, data5)
+    #print 'Start TPR1, FPR1'
+    #TPR1, FPR1 = cal_TPR_FPR(simFileName5, data5)
     print 'Start TPR2, FPR2'
     TPR2, FPR2 = cal_TPR_FPR(simFileName5, data6)
     print 'Start TPR3, FPR3'
     TPR3, FPR3 = cal_TPR_FPR_babel(simFileName5, babelFileName)
-    plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFigName)
+    #plot_roc(TPR1, FPR1, TPR2, FPR2, TPR3, FPR3, rocFigName)
+    plot_roc(TPR2, FPR2, TPR3, FPR3, rocFigName)
     print 'plot ROC: Done!'
