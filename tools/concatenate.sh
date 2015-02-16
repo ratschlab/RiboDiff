@@ -16,3 +16,4 @@ sed 's/condition/RnaCondition/g' $cntRnaFile > Tmp.txt; mv Tmp.txt $cntRnaFile
 seqNumRibo=`echo $(seq -s, 1 $(($repRiboCondA+$repRiboCondB+1))) | sed 's/,$//'`
 seqNumRna=`echo $(seq -s, 2 $(($repRnaCondA+$repRnaCondB+1))) | sed 's/,$//'`
 paste <(cut -f $seqNumRibo $cntRiboFile) <(cut -f $seqNumRna $cntRnaFile) > $outputName
+
