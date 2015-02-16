@@ -91,12 +91,13 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
     sizeFactorsB = [1.098537, 0.958124]
 
     FileIn = gzip.GzipFile(gqPklz, 'rb')
-    (GENE_ID, CHR, GENE_STRAND, GQ_ALL_POS, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS) = pickle.load(FileIn)
+    (GENE_ID, CHR, GENE_STRAND, GQ_ALL_POS, GQ_ALL_SEQ, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS, GQ_IS_FIRST, CDS_COV_MU) = pickle.load(FileIn)
     FileIn.close()
     print 'Load GQ data: done.'
 
     COVDIFF_ALL = np.zeros(LengthFLK + destLengthGQ + LengthFLK)
     #FREQUNENCY  = np.zeros(LengthFLK + destLengthGQ + LengthFLK)
+    COVDIFF = np.zeros(LengthFLK + destLengthGQ + LengthFLK)
 
     FileIn = open(geneList, 'r')
 
@@ -111,7 +112,14 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
                 print '\n%s dose not exists in annotation file.' % geneID
                 continue
 
-            IDX = np.nonzero(np.asarray(GQ_COV_POS[geneID]) == 1)[0]
+            COVDIFF_GENE = []
+            COVMEAN_GENE_A = np.zeros(0)
+            COVMEAN_GENE_B = np.zeros(0)
+            #IDX = np.nonzero(np.asarray(GQ_IS_FIRST[geneID]) == 1)[0]
+            if not CDS_COV_MU[geneID]:
+                continue
+            CDSCOVMAX = max(CDS_COV_MU[geneID])
+            IDX = np.logical_and(np.asarray(GQ_IS_FIRST[geneID]) == 1, CDS_COV_MU[geneID] == CDSCOVMAX).nonzero()[0]
             for idx in IDX:
                 expGQ = GQ_ALL_POS[geneID][idx]
                 expGQcov_A = get_cov_wrapper(expGQ, bamFilesCondA, sizeFactorsA, CHR[geneID], GENE_STRAND[geneID])
@@ -129,6 +137,8 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
                     FLK5PcovDiff[idxMask] = 0.0
                 else:
                     FLK5PcovDiff = np.zeros(0)
+                    FLK5Pcov_A = np.array([0])
+                    FLK5Pcov_B = np.array([0])
 
                 FLK3P = FLK3P_COV_POS[geneID][idx]
                 if type(FLK3P).__module__ == np.__name__:
@@ -139,6 +149,8 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
                     FLK3PcovDiff[idxMask] = 0.0
                 else:
                     FLK3PcovDiff = np.zeros(0)
+                    FLK3Pcov_A = np.array([0])
+                    FLK3Pcov_B = np.array([0])
 
                 expGQcovDiffNormLen = normalize_length(expGQcovDiff, destLengthGQ)
 
@@ -146,17 +158,39 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
                 COVDIFF_5P_ONE = np.hstack([np.zeros(LengthFLK - FLK5PcovDiff.size), FLK5PcovDiff])
                 COVDIFF_3P_ONE = np.hstack([FLK3PcovDiff, np.zeros(LengthFLK - FLK3PcovDiff.size)])
                 COVDIFF_ONE = np.hstack([COVDIFF_5P_ONE, COVDIFF_GQ_ONE, COVDIFF_3P_ONE])
-                #COVDIFF_ALL = COVDIFF_ALL + COVDIFF_ONE
                 COVDIFF_ALL = np.vstack([COVDIFF_ALL, COVDIFF_ONE])
+                #COVDIFF_GENE.append(COVDIFF_ONE.tolist())
+
+                #COVDIFF_ALL = COVDIFF_ALL + COVDIFF_ONE
                 #idxEff = np.nonzero(COVDIFF_ONE != 0.0)
                 #FREQUNENCY[idxEff] = FREQUNENCY[idxEff] + 1.0
+
+                #COVMEAN_GENE_A = np.hstack([COVMEAN_GENE_A, np.mean(np.hstack([FLK5Pcov_A, expGQcov_A]))])
+                #COVMEAN_GENE_B = np.hstack([COVMEAN_GENE_B, np.mean(np.hstack([FLK5Pcov_B, expGQcov_B]))])
+                #COVMEAN_GENE_A = np.hstack([COVMEAN_GENE_A, np.mean(FLK5Pcov_A)])
+                #COVMEAN_GENE_B = np.hstack([COVMEAN_GENE_B, np.mean(FLK5Pcov_B)])
+
+            #if COVDIFF_GENE:
+            #    #idxMax_A = np.argmax(COVMEAN_GENE_A)
+            #    idxMax_B = np.argmax(COVMEAN_GENE_B)
+            #    COVDIFF_ALL = np.vstack([COVDIFF_ALL, COVDIFF_GENE[idxMax_B]])
 
             sys.stdout.flush()
             print '\r%i genes finished ...' % cnt ,
             cnt += 1
 
     #COVDIFF = COVDIFF_ALL / FREQUNENCY
-    COVDIFF = gmean(COVDIFF_ALL, axis=0).data
+    for i in range(COVDIFF_ALL.shape[1]):
+        eachColumn = COVDIFF_ALL[:,i].copy()
+        eachColumnNonzero = eachColumn[eachColumn > 0]
+        if eachColumnNonzero.size != 0:
+            eachColumnGMEAN = gmean(eachColumnNonzero)
+        else:
+            eachColumnGMEAN = 0.0
+        COVDIFF[i] = eachColumnGMEAN
+    
+    #pdb.set_trace()
+    #COVDIFF = gmean(COVDIFF_ALL, axis=0).data
 
     FileIn.close()
 
@@ -164,8 +198,8 @@ def get_cov_diff(geneList, gqPklz, destLengthGQ, LengthFLK):
 
 if __name__ == '__main__':
 
-    outputTxt = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.cutoff6.txt'
-    outputPdf = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.cutoff6.pdf'
+    outputTxt = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.domTransc1stGQ.txt'
+    outputPdf = '/cbio/grlab/projects/RibosomeFootprint/GQ/SilTE_DownUp.prot.5p.utr5.all.domTransc1stGQ.pdf'
     destLengthGQ = 30.0
     LengthFLK = 40.0
 

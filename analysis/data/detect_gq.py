@@ -5,7 +5,46 @@ import numpy as np
 import cPickle as pickle 
 import gzip
 import re
+import pysam
 import pdb
+
+def get_cov(bam, obj, chr):
+
+    bamFile = pysam.AlignmentFile(bam, 'rb')
+    covRegion = []
+    for j in range(obj.shape[0]):
+        left = obj[j, 0]
+        right = obj[j, 1]
+        cov = []
+        pos = []
+        covSegment = np.zeros(right-left+1)
+        for eachBase in bamFile.pileup(chr, left-1, right, truncate=True):
+            cov.append(eachBase.nsegments)
+            pos.append(eachBase.reference_pos)
+
+            POS = np.asarray(pos)
+            posRegion = np.arange(left-1, right)
+            idx = np.in1d(posRegion, POS)
+            covSegment[idx] = cov
+
+        covRegion = np.hstack([covRegion, covSegment])
+
+    bamFile.close()
+
+    return covRegion
+
+def get_cov_wrapper(npArray, bamFiles, sizeFactors, chr, strand):
+
+    covRegion = np.zeros(1)
+    for k in range(len(bamFiles)):
+        covRegion_1Bam = get_cov(bamFiles[k], npArray, chr)
+        covRegion_1Bam = covRegion_1Bam / sizeFactors[k]
+        covRegion = covRegion + covRegion_1Bam
+    covRegion = covRegion / len(bamFiles)
+    if strand == '-':
+        covRegion = covRegion[::-1]
+
+    return covRegion
 
 def local_transc_pos_2_global(transcID, transc_id, transc, gene_strand, localPosStart, localPosEnd):
 
@@ -78,13 +117,16 @@ def check_and_trim_FLK(GQ_ALL_POS_LOCAL, GQ_COV_POS, FLK_COV_POS_LOCAL, WHICH):
 
     return FLK_COV_POS_LOCAL
 
-def get_unique_global_pos(rdGQ_ALL_POS, rdGQ_COV_POS, rdGQ_INC_POS, rdFLK5P_COV_POS, rdFLK3P_COV_POS):
+def get_unique_global_pos(rdGQ_ALL_POS, rdGQ_ALL_SEQ, rdGQ_COV_POS, rdGQ_INC_POS, rdFLK5P_COV_POS, rdFLK3P_COV_POS, rdGQ_IS_FIRST, rdCDS_COV_MU):
 
     nrdGQ_ALL_POS = {}
+    nrdGQ_ALL_SEQ = {}
     nrdGQ_COV_POS = {}
     nrdGQ_INC_POS = {}
     nrdFLK5P_COV_POS = {}
     nrdFLK3P_COV_POS = {}
+    nrdGQ_IS_FIRST = {}
+    nrdCDS_COV_MU = {}
 
     numGene = 0
     numGQ_ALL = 0
@@ -94,27 +136,43 @@ def get_unique_global_pos(rdGQ_ALL_POS, rdGQ_COV_POS, rdGQ_INC_POS, rdFLK5P_COV_
         if len(rdGQ_ALL_POS[eachKey]) != 0:
             uniqueListLists = []
             uniqueListArray = []
+            uniqueListSEQ = []
             uniqueListCOV = []
             uniqueListINC = []
             uniqueListFLK5P = []
             uniqueListFLK3P = []
+            uniqueListFIRST = []
+            uniqueListCDS = []
 
             idx = 0
             for eachRdPos in rdGQ_ALL_POS[eachKey]:
                 if eachRdPos.tolist() not in uniqueListLists:
                     uniqueListLists.append(eachRdPos.tolist())
                     uniqueListArray.append(eachRdPos)
+                    uniqueListSEQ.append(rdGQ_ALL_SEQ[eachKey][idx])
                     uniqueListCOV.append(rdGQ_COV_POS[eachKey][idx])
                     uniqueListINC.append(rdGQ_INC_POS[eachKey][idx])
                     uniqueListFLK5P.append(rdFLK5P_COV_POS[eachKey][idx])
                     uniqueListFLK3P.append(rdFLK3P_COV_POS[eachKey][idx])
+                    uniqueListFIRST.append(rdGQ_IS_FIRST[eachKey][idx])
+                    uniqueListCDS.append(rdCDS_COV_MU[eachKey][idx])
+                else:
+                    IDX = uniqueListLists.index(eachRdPos.tolist())
+                    if rdGQ_IS_FIRST[eachKey][idx] == 1:
+                        uniqueListFIRST[IDX] = 1
+                    if rdCDS_COV_MU[eachKey][idx] > uniqueListCDS[IDX]:
+                        uniqueListCDS[IDX] = rdCDS_COV_MU[eachKey][idx]
+
                 idx += 1
 
             nrdGQ_ALL_POS[eachKey] = uniqueListArray
+            nrdGQ_ALL_SEQ[eachKey] = uniqueListSEQ
             nrdGQ_COV_POS[eachKey] = uniqueListCOV
             nrdGQ_INC_POS[eachKey] = uniqueListINC
             nrdFLK5P_COV_POS[eachKey] = uniqueListFLK5P
             nrdFLK3P_COV_POS[eachKey] = uniqueListFLK3P
+            nrdGQ_IS_FIRST[eachKey] = uniqueListFIRST
+            nrdCDS_COV_MU[eachKey] = uniqueListCDS
 
             numGene += 1
             numGQ_ALL = numGQ_ALL + len(uniqueListArray)
@@ -122,12 +180,15 @@ def get_unique_global_pos(rdGQ_ALL_POS, rdGQ_COV_POS, rdGQ_INC_POS, rdFLK5P_COV_
             numGQ_INC = numGQ_INC + len([e for e in uniqueListINC if e == 1])
         else:
             nrdGQ_ALL_POS[eachKey] = []
+            nrdGQ_ALL_SEQ[eachKey] = []
             nrdGQ_COV_POS[eachKey] = []
             nrdGQ_INC_POS[eachKey] = []
             nrdFLK5P_COV_POS[eachKey] = []
             nrdFLK3P_COV_POS[eachKey] = []
+            nrdGQ_IS_FIRST[eachKey] = []
+            nrdCDS_COV_MU[eachKey] = []
 
-    return (nrdGQ_ALL_POS, nrdGQ_COV_POS, nrdGQ_INC_POS, nrdFLK5P_COV_POS, nrdFLK3P_COV_POS, numGene, numGQ_ALL, numGQ_COV, numGQ_INC)
+    return (nrdGQ_ALL_POS, nrdGQ_ALL_SEQ, nrdGQ_COV_POS, nrdGQ_INC_POS, nrdFLK5P_COV_POS, nrdFLK3P_COV_POS, nrdGQ_IS_FIRST, nrdCDS_COV_MU, numGene, numGQ_ALL, numGQ_COV, numGQ_INC)
 
 def main():
 
@@ -152,10 +213,13 @@ def main():
     CHR = {}
     GENE_STRAND = {}
     GQ_ALL_POS = {}
+    GQ_ALL_SEQ = {}
     GQ_COV_POS = {}
     GQ_INC_POS = {}
     FLK5P_COV_POS = {}
     FLK3P_COV_POS = {}
+    GQ_IS_FIRST = {}
+    CDS_COV_MU = {}
 
     numBaseINC = 0
     numBaseDEC = 0
@@ -168,6 +232,7 @@ def main():
             geneID = line.strip().split('|')[0].replace('>', '')
             transcID = line.strip().split('|')[1]
             geneName = line.strip().split('|')[2]
+
             if geneID not in GQ_ALL_POS:
 
                 sys.stdout.flush()
@@ -178,10 +243,23 @@ def main():
                 CHR[geneID] = chr[geneID]
                 GENE_STRAND[geneID] = gene_strand[geneID]
                 GQ_ALL_POS[geneID] = []
+                GQ_ALL_SEQ[geneID] = []
                 GQ_COV_POS[geneID] = []
                 GQ_INC_POS[geneID] = []
                 FLK5P_COV_POS[geneID] = []
                 FLK3P_COV_POS[geneID] = []
+                GQ_IS_FIRST[geneID] = []
+                CDS_COV_MU[geneID] = []
+
+            bamDir = '/cbio/grlab/projects/GuidoWendel/Silvestrol/results/alignments/bam/'
+            bamFilesCondB = [bamDir + 'all_Silvestiol_1_Ribo.uq.sorted.rRNAfiltered.rtrimfilterd.25-35.final.bam', bamDir + 'all_Silvestiol_3_Ribo.uq.sorted.rRNAfiltered.rtrimfilterd.25-35.final.bam']
+            sizeFactorsB = [1.098537, 0.958124]
+            idx = np.in1d(transc_id[geneID], transcID).nonzero()[0]
+            cdsCov = get_cov_wrapper(cds[geneID][idx], bamFilesCondB, sizeFactorsB, chr[geneID], gene_strand[geneID])
+            if cdsCov.size == 0:
+                meanCdsCov = 0.0
+            else:
+                meanCdsCov = np.mean(cdsCov)
 
             seq = next(FileIn).strip()
             cov = next(FileIn).strip()
@@ -189,12 +267,17 @@ def main():
             GQ_ALL_POS_LOCAL = []
             FLK5P_COV_POS_LOCAL = []
             FLK3P_COV_POS_LOCAL = []
+            IS_FIRST = 1
             iterSeq = regSeq.finditer(seq)
             for matchSeq in iterSeq:
                 if len(regSplit.split(matchSeq.group())) >= 3:
                     globalPosGQ = local_transc_pos_2_global(transcID, transc_id[geneID], transc[geneID], gene_strand[geneID], matchSeq.start()+1, matchSeq.end())
                     GQ_ALL_POS[geneID].append(globalPosGQ)
+                    GQ_ALL_SEQ[geneID].append(matchSeq.group())
                     GQ_ALL_POS_LOCAL.append([matchSeq.start()+1, matchSeq.end()])
+                    GQ_IS_FIRST[geneID].append(IS_FIRST)
+                    CDS_COV_MU[geneID].append(meanCdsCov)
+                    IS_FIRST = 0
 
                     covDiff = cov[matchSeq.start() : matchSeq.end()]
                     if regDiff1.search(covDiff):
@@ -255,9 +338,14 @@ def main():
     FileIn.close()
 
     print '\nStart to remove repeated global positions ...'
-    GQ_ALL_POS, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS, numGene, numGQ_ALL, numGQ_COV, numGQ_INC = get_unique_global_pos(GQ_ALL_POS, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS)
+    GQ_ALL_POS, GQ_ALL_SEQ, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS, GQ_IS_FIRST, CDS_COV_MU, numGene, numGQ_ALL, numGQ_COV, numGQ_INC = get_unique_global_pos(GQ_ALL_POS, GQ_ALL_SEQ, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS, GQ_IS_FIRST, CDS_COV_MU)
 
-    genes = (GENE_ID, CHR, GENE_STRAND, GQ_ALL_POS, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS)
+    #for eachGene in GQ_INC_POS:
+    #    IDX = np.nonzero(np.asarray(GQ_INC_POS[eachGene]) == 1)[0]
+    #    for idx in IDX:
+    #        print GQ_ALL_SEQ[eachGene][idx]
+
+    genes = (GENE_ID, CHR, GENE_STRAND, GQ_ALL_POS, GQ_ALL_SEQ, GQ_COV_POS, GQ_INC_POS, FLK5P_COV_POS, FLK3P_COV_POS, GQ_IS_FIRST, CDS_COV_MU)
     FileOut = gzip.GzipFile(gqPklz, 'wb')
     pickle.dump(genes, FileOut, pickle.HIGHEST_PROTOCOL)
     FileOut.close()
