@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """ This script generates two groups of negative binomial distributed discrete random variables. The two groups (condition A and condition B) contain equal number of  
-    entries (GENE0001, GENE0002, ... GENE1000, ...), and each entry can have multiple replicates in each condition. The mean of each entry is also negative binomial 
-    distributed. By using arguments '--beta1' and '--beta2', users can change the dispersion-mean relationship in order to generate different data set, for instance, 
-    Ribo-Seq and RNA-Seq data. """
+    entries (GENE0001, GENE0002, ... GENE1000, ...), and each entry can have multiple replicates in each condition. The mean of each entry across replicates is negative 
+    binomial distributed as well. By using arguments '--beta1' and '--beta2', users can change the dispersion-mean relationship in order to generate different data set, 
+    for instance, Ribo-Seq and RNA-Seq data. """
 
 import sys
 import numpy as np
@@ -139,14 +139,6 @@ def generate_count(options):
         foldDiffUp = gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffUp)
         foldDiffDn = 1.0 / gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffDn)
 
-        # Change the mean count of condition A and B. Assume there is a negative correlation between mean count and fold change.
-        #idxUpMem = np.searchsorted(np.sort(mu[idxUp]), mu[idxUp])
-        #idxDnMem = np.searchsorted(np.sort(mu[idxDn]), mu[idxDn])
-        #muNewUp = np.sort(mu[idxUp]) * np.sort(foldDiffUp)[::-1]
-        #muNewDn = np.sort(mu[idxDn]) * np.sort(foldDiffDn)
-        #muB[idxUp] = muNewUp[idxUpMem]
-        #muB[idxDn] = muNewDn[idxDnMem]
-
         # Change the mean count of condition A and condition B without changing the overall mean count across the two conditions.
         # (MeanCountA + MeanCountB) / 2 = MeanCountOrigin & MeanCountA * FoldChange = MeanCountB
         # Assume there is a negative correlation between mean count and fold change.
@@ -181,7 +173,7 @@ def generate_count(options):
 
             countString = '\t'.join(str(element) for element in countList)
 
-            if not numDiff:
+            if not options.numDiff:
                 setAsDiff = '-1'
             elif i in idxUp:
                 setAsDiff = '1'

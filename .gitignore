@@ -2,3 +2,4 @@ exp/
 analysis/
 src/adjlik0.py
 src/writeres0.py
+tools/nbinom_count_generator.sh
