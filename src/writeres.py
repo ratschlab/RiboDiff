@@ -1,7 +1,20 @@
+#!/usr/bin/env python 
+"""
+Output result files.
+"""
+
 import numpy as np
 import cPickle as pickle
 
 def write_result(data, opts):
+    """
+    Output the result to plain text format.
+
+    @args data: Store all input data and results
+    @type data: Class object
+    @args opts: Input argument to the main TE function 
+    @type opts: Instance
+    """
 
     geneIDs = data.geneIDs
     pval = data.pval.astype(str)
@@ -45,6 +58,14 @@ def write_result(data, opts):
     np.savetxt(opts.outFile, outNdarray, fmt='%s', delimiter='\t', header=header, comments='')
 
 def save_data(data, opts):
+    """
+    Saving in python object form.
+
+    @args data: Store all input data and results
+    @type data: Class object
+    @args opts: Input argument to the main TE function 
+    @type opts: Instance
+    """
 
     if '.' not in opts.outFile or opts.outFile.endswith('.pkl'):
         pklFile = opts.outFile + '.pkl'

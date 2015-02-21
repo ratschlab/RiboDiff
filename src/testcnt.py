@@ -1,3 +1,8 @@
+#!/usr/bin/env python 
+"""
+Statistical test.
+"""
+
 import sys
 import numpy as np
 import creatematrix as cm
@@ -6,6 +11,14 @@ from scipy.stats import chi2
 import statsmodels.sandbox as sms
 
 def test_count(data, opts):
+    """
+    Make a test for all genes iteratively.
+
+    @args data: Store all input data and results
+    @type data: Class object
+    @args opts: Input argument to the main TE function 
+    @type opts: Instance
+    """
 
     print 'Start the statistical test.'
 
@@ -21,7 +34,6 @@ def test_count(data, opts):
     lenSampleRna  = data.idxRna.size
 
     for i in range(num):
-
         sys.stdout.flush()
 
         if i % 50 == 0:
@@ -52,6 +64,14 @@ def test_count(data, opts):
     return data
 
 def adj_pval(data, opts):
+    """
+    Perform multiple test correction.
+
+    @args data: Store all input data and results
+    @type data: Class object
+    @args opts: Input arguments to the main TE function 
+    @type opts: Instance
+    """
 
     pval = data.pval.copy()
     idx = ~np.isnan(pval)
@@ -83,6 +103,12 @@ def adj_pval(data, opts):
     return data
 
 def cal_TEchange(data):
+    """
+    Calculate Translational Efficiency changes.
+
+    @args data: Store all input data and results
+    @type data: Class object
+    """
 
     const = 1.0
 

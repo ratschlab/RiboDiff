@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Plotting the data and results.
+"""
 
 import sys
 import os

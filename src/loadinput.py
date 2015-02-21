@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+"""
+Loading and preparing the data.
+"""
 
+import re
 import sys
 import numpy as np
-import re
 
 class LoadInputs(object):
-
     """ Read the experiment description file, and use it to guide reading gene count file. """
 
     def __init__(self, opts):
@@ -61,7 +63,6 @@ class LoadInputs(object):
         self.dispDiff = opts.dispDiff
 
     def parse_expt(self):
-
         """ Read the experiment description file """
 
         self.experiment = np.loadtxt(self.fileNameExper, dtype=str, delimiter=',', skiprows=1)
@@ -116,7 +117,6 @@ class LoadInputs(object):
         return self
 
     def read_count(self):
-
         """ Load the discrete count file """
 
         with open(self.fileNameCount, 'r') as FileIn:

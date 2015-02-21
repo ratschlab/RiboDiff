@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+"""
+Negatibe binomial likelihood function.
+"""
+
 import numpy as np
 import scipy as sp
 from scipy.stats import nbinom

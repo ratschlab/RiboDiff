@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+"""
+Command line argument parser.
+"""
+
 import sys
 import os
 from optparse import OptionParser, OptionGroup

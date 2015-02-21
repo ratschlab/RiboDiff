@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+"""
+Creating the explanatory matrix for GLM.
+"""
+
 import sys
 import numpy as np
 

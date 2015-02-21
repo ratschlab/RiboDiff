@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+"""
+Estimating the raw dispersion.
+"""
+
 import sys
 import numpy as np
 import statsmodels.api as sm

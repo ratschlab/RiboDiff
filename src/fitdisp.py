@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+"""
+Fitting the raw dispersion to a gamma regression.
+"""
+
 import numpy as np
 import statsmodels.api as sm
 

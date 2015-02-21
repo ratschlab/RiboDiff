@@ -1,16 +1,24 @@
 #!/usr/bin/env python
+"""
+Calculating the sequencing library size.
+""" 
 
 import sys
 import numpy as np
 import loadinput as ld
 
 def usage():
-
+    """
+    Help message.
+    """
     sys.stderr.write('Usage:' + '\n' + 'python normalize.py Experiment_Outline_File Count_File' + '\n')
 
 def lib_size(countNdarray):
-
-    """ Calculate library size """
+    """ Calculating library size.
+    
+    @args countNdarray: read count data
+    @type countNdarray: numpy array
+    """
 
     if np.any(countNdarray < 0, axis=None):
         sys.stderr.write('Error: read count smaller than one is detected, please check input file.\n')
