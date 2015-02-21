@@ -1,13 +1,25 @@
 #!/usr/bin/env python
+"""
+Master script running RiboDiff program.
+
+Usage: 
+    python TE.py -e <exp_outline.txt> -c <cnt_table.txt> -o <result.txt> -d [0] -r [1] -p [1] -q [0.1]
+
+Details: 
+    Check the MANUAL in RibiDiff directory. Type "python TE.py -h" to get the help information.
+"""
 
 import sys
+import os
 from parseopts import *
 
 def main():
+    """
+    Master function definition to call different functionalities of RiboDiff.
+    """
 
     opts = parse_options(sys.argv)
 
-    import os
     import numpy as np
     import loadinput as ld
     import normalize as nm
@@ -65,5 +77,4 @@ def main():
     print '*'*25
 
 if __name__ == '__main__':
-
     main()

@@ -1,6 +1,7 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+
 """
-installation scripts based on these:
+Installation scripts based on these:
 http://www.scotttorborg.com/python-packaging/minimal.html
 http://packages.python.org/distribute/setuptools.html
 """
@@ -22,5 +23,5 @@ setup(name='RiboDiff',
       author_email=['zhongy@cbio.mskcc.org', 'vipin@cbio.mskcc.org'], 
       license='GPLv3',
       packages=['src'],
-      install_requires=['numpy', 'statsmodels'],
+      install_requires=['numpy', 'scipy', 'statsmodels'],
       zip_safe=False)
