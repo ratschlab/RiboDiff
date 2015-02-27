@@ -12,12 +12,16 @@ from scipy.special import polygamma
 import adjlik as al
 
 def calculate_logprior(disp, dispFitted, varPrior):
+    """
+    """
 
     logprior = (np.log(disp) - np.log(dispFitted)) ** 2 / (2 * varPrior ** 2)
 
     return logprior
 
 def adj_loglikelihood_shrink(x, lenSampleRibo, lenSampleRna, explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign):
+    """
+    """
 
     loglik_adj = al.adj_loglikelihood(x, lenSampleRibo, lenSampleRna, explanatory, response, yhat, 1.0)
     logpriorRibo = calculate_logprior(x[0], dispFittedRibo, varPriorRibo)
@@ -27,6 +31,8 @@ def adj_loglikelihood_shrink(x, lenSampleRibo, lenSampleRna, explanatory, respon
     return loglik_adj_shrk * sign
 
 def adj_loglikelihood_shrink_scalar(disp, explanatory, response, yhat, dispFittedRibo, dispFittedRna, varPriorRibo, varPriorRna, sign):
+    """
+    """
 
     loglik_adj = al.adj_loglikelihood_scalar(disp, explanatory, response, yhat, 1.0)
     logpriorRibo = calculate_logprior(disp, dispFittedRibo, varPriorRibo)
@@ -36,6 +42,8 @@ def adj_loglikelihood_shrink_scalar(disp, explanatory, response, yhat, dispFitte
     return loglik_adj_shrk * sign
 
 def adj_loglikelihood_shrink_scalar_onedisper(disp, explanatory, response, yhat, dispFitted, varPrior, sign):
+    """
+    """
 
     loglik_adj = al.adj_loglikelihood_scalar(disp, explanatory, response, yhat, 1.0)
     logprior = calculate_logprior(disp, dispFitted, varPrior)
@@ -44,6 +52,8 @@ def adj_loglikelihood_shrink_scalar_onedisper(disp, explanatory, response, yhat,
     return loglik_adj_shrk * sign
 
 def calculate_varPrior(dispRaw, dispFitted, dispFittedIdx, varLogDispSamp):
+    """
+    """
 
     logResidule = np.log(dispRaw[dispFittedIdx]) - np.log(dispFitted[dispFittedIdx])
     stdLogResidule = np.median(np.abs(logResidule - np.median(logResidule))) * 1.4826
@@ -56,6 +66,8 @@ def calculate_varPrior(dispRaw, dispFitted, dispFittedIdx, varLogDispSamp):
     return varPrior
 
 def disper_adj(data, opts):
+    """
+    """
 
     print 'Start to estimate adjusted dispersions.'
 
