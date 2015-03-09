@@ -7,6 +7,8 @@ import sys
 import os
 import cPickle as pickle
 import numpy as np
+import matplotlib 
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from optparse import OptionParser, OptionGroup
 
