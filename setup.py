@@ -24,5 +24,6 @@ setup(name='RiboDiff',
       license='GPLv3',
       packages=['ribodiff'],
       package_dir={'ribodiff': 'src/ribodiff'},
-      install_requires=['numpy', 'scipy', 'statsmodels'],
+      install_requires=['numpy', 'scipy', 'statsmodels', 'matplotlib'],
+      test_suite="test",
       zip_safe=False)
