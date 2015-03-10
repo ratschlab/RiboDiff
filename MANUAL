@@ -2,7 +2,7 @@
 RiboDiff Manual
 ===============
 
-This document shows how to use RiboDiff to detect the protein translation efficiency 
+This document shows how to use RiboDiff to detect the protein translational efficiency 
 change from ribosome footprint profile (Ribo-Seq) and RNA-Seq data in different 
 experimental conditions.
 
@@ -55,7 +55,7 @@ for Ribo-Seq and RNA-Seq separately. Next, RiboDiff performs a statistical test 
 on the H0 and H1 model fitting. Finally, multiple test correction is performed to generate 
 an adjuste P value for every gene.
 
-RiboDiff also calculates the log2 fold change of translation efficiency for all genes.
+RiboDiff also calculates the log2 fold change of translational efficiency for all genes.
 In addition, RiboDiff can plot figures to visualize the data and the statistical test 
 results. The figures includes
 
@@ -64,10 +64,10 @@ results. The figures includes
 
 	2) A histogram of dispersion difference of all genes.
 
-	3) A scatter plot of log fold change of translation efficiency against the mean 
+	3) A scatter plot of log fold change of translational efficiency against the mean 
 	count across replicates of Ribo-Seq.
 
-	4) A histogram of log fold change of translation efficiency with significant proportion
+	4) A histogram of log fold change of translational efficiency with significant proportion
 	marked in red (TE down) and blue (TE up).
 
 The dispersion used in 1) and 2) is the empirical dispersion. It is calculated as the
@@ -105,4 +105,10 @@ Options:
                      format. On: 1; Off: 0. [default: 0]
     -q CUTOFFFDR     Set the FDR cutoff for significant case to plot.
                      [default: 0.1]
+
+Similar to many other RNA-Seq based tools, RiboDiff uses negative binomial distribution to 
+model the read count, which handles larger variation across samples than Poisson. However, 
+we have observed that the randomness of count data from certain type of samples, such as 
+different individuals, may be extremely large. In this case, limited number of replicates 
+cannot provide a good estimation on dispersion, which ends up with less significant results.
 
