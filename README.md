@@ -1,12 +1,15 @@
 SOFTWARE
 RiboDiff
+========
 
 VERSION
 0.1
+========
 
 Authors
 Yi Zhong, Philipp Drewe, Theofanis Karaletsos, Vipin Sreedharan 
 and Gunnar Raetsch.
+========
 
 DESCRIPTION
 RiboDiff is a statistical framework to detect the protein translation 
