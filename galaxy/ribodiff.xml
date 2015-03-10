@@ -1,0 +1,90 @@
+<tool id="ribodiff" name="RiboDiff" version="0.1">
+  <description>Detect Protein Translational Efficiency Difference</description>
+  <command interpreter="bash"> 
+    ./../src/
+
+    $anno_file
+    $ribo_diff_out
+    $ribo_diff_out.extra_files_path
+
+#for $i in $groups
+#for $j in $i.replicates
+$j.bam_alignment:#slurp
+#end for
+
+#end for
+    >> $Log_File </command>
+  <inputs>
+
+   <!-- TODO read count table file -->
+	<param format="txt" name="" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
+
+   <!-- experiment details file  -->
+	<param format="csv" name="" type="data" label="Experiment details" help="This can guide to infer the read count file."/>
+
+    <!--default 0,1 -->
+    <param name="dispersion" default="0">
+
+    
+    <!--default 0,1 option to create plots -->
+
+  </inputs>
+
+  <outputs>
+    <!--default 0,1 option to create plots -->
+    <data format="txt" name="ribo_diff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
+    <data format="txt" name="Log_File" label="${tool.name} on ${on_string}: log"/>
+  </outputs>
+
+  <tests>
+    <test> 
+    <!--TODO-->
+    </test>
+  </tests> 
+
+  <help>
+
+.. class:: infomark
+
+**What it does** 
+
+RiboDiff is a tool for detecting protein translational efficiency difference based on RNA-Seq and Ribosome footprinting data.
+
+`RiboDiff` requires:
+
+experiment files grouped into replicate groups, each containing several replicates. 
+The program will also work with only two groups containing only a single replicate each. 
+However, this analysis has less statistical power and is therefore not recommended!
+
+------
+
+**Reference**
+
+If **RiboDiff** is used to obtain results for scientific publications it
+should be cited as [1]_.
+
+.. [1] 
+
+
+------
+
+.. class:: infomark
+
+**About formats**
+
+**read count table ** 
+
+    9. attributes - All lines with the same group are linked together into a single item.
+
+For more information see 
+
+**experiment outline file format** 
+
+The format specification and the description of SAMtools can be found on http://
+
+------
+
+RiboDiff Wrapper Version 0.1 (Mar 2015)
+
+</help>
+</tool>
