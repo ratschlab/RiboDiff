@@ -24,6 +24,7 @@ XXX
 * Numpy >= 1.8.0
 * Scipy >= 0.13.3
 * Statsmodels >= 0.6.0
+* Matplotlib >= 1.3.0 
 
 ###GETTING STARTED
 
