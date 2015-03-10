@@ -1,0 +1,114 @@
+===============
+RiboDiff Manual
+===============
+
+This document shows how to use RiboDiff to detect the protein translational efficiency 
+change from ribosome footprint profile (Ribo-Seq) and RNA-Seq data in different 
+experimental conditions.
+
+To run RiboDiff, please provide two input files:
+
+1) A comma delimited text file that describes the experimental design. Here is an example:
+
+Samples,Data_Type,Conditions
+RbCtlR1,Ribo-Seq,Control
+RbCtlR2,Ribo-Seq,Control
+RbTrtR1,Ribo-Seq,DrugTreated
+RbTrtR2,Ribo-Seq,DrugTreated
+RnaCtlR1,RNA-Seq,Control
+RnaCtlR2,RNA-Seq,Control
+RnaCtlR3,RNA-Seq,Control
+RnaTrtR1,RNA-Seq,DrugTreated
+RnaTrtR2,RNA-Seq,DrugTreated
+RnaTrtR3,RNA-Seq,DrugTreated
+
+In this experimental design file, there are three columns organized underneath a header 
+line. The first column indicates the sample names. The second column indicates the data 
+type. It only accepts "Ribo-Seq" and "RNA-Seq" to represent the ribosome footprint and 
+RNA-Seq data, respectively. The last column indicates to which condition the sample 
+belongs. More than two condition keywords are not accepted here. Note the columns are 
+comma separated.
+
+2) A text file containing the raw read count for each gene as follows:
+
+Entry	RbCtlR1	RbCtlR2	RbTrtR1	RbTrtR2	RnaCtlR1	RnaCtlR2	RnaCtlR3	RnaTrtR1	RnaTrtR2	RnaTrtR3
+G0001	69		77		81		98		2914		2931		3048		2520		2566		2464
+G0002	159		141		145		139		1285		1285		1246		1242		1246		1313
+G0003	246		239		236		259		806			847			859			862			819			833
+G0004	70		59		71		84		1413		1490		1511		1464		1499		1544
+.....
+.....
+
+In this count file, the sample name in header must agree with that in experimental design 
+file. The columns are tab-separated.
+
+The command to run RiboDiff is
+
+******************************
+******************************
+
+RiboDiff loads the input files and normalizes the raw count of each replicate sample 
+according to its sequencing library size. Then, it estimates the dispersion parameter 
+for each gene using a generalized linear model, assuming that read counts follow a negative 
+binomial distribution. Note, users can enable/disable the different dispersion estimation 
+for Ribo-Seq and RNA-Seq separately. Next, RiboDiff performs a statistical test based 
+on the H0 and H1 model fitting. Finally, multiple test correction is performed to generate 
+an adjuste P value for every gene.
+
+RiboDiff also calculates the log2 fold change of translational efficiency for all genes.
+In addition, RiboDiff can plot figures to visualize the data and the statistical test 
+results. The figures includes
+
+	1) A scatter plot of dispersion against the mean count across replicates of Ribo-Seq 
+	and RNA-Seq.
+
+	2) A histogram of dispersion difference of all genes.
+
+	3) A scatter plot of log fold change of translational efficiency against the mean 
+	count across replicates of Ribo-Seq.
+
+	4) A histogram of log fold change of translational efficiency with significant proportion
+	marked in red (TE down) and blue (TE up).
+
+The dispersion used in 1) and 2) is the empirical dispersion. It is calculated as the
+relationship of Var = mean + (mean x disp^2)
+
+Here is the help information of running RiboDiff. Users can display it by typing
+"python TE.py -h" in command line. 
+
+Usage: TE.py [options]
+
+Options:
+  -h, --help         show this help message and exit
+
+  REQUIRED:
+    -e EXPTOUTLINE   Text file describing experiment Outline. Must follow
+                     required format, please see the manual.
+    -c CNTFILE       Text file containing the count data. Header line must be
+                     consistant with information in experiment Outline.
+    -o OUTFILE       Tab delimited text file containing the results.
+
+  OPTIONAL:
+    -d DISPDIFF      Allow different dispersions for Ribo-seq and RNA-seq
+                     count data. On: 1; Off: 0. [default: 1]
+    -s SUMCNTCUTOFF  Set the sum of normalized read count as the threshold to
+                     do the test. This option applies for both Ribo-seq and
+                     RNA-seq data. [default: 10]
+    -i DISPINITIAL   Set the initial dispersion to start the estimation.
+                     [default: 0.01]
+    -m MULTITEST     Method for multiple test correction. Options: BH
+                     (Benjamini-Hochberg); Bonferroni. [default: BH]
+    -r RANKRESULT    Rank the result table in ascending order by a specific
+                     column. Adjusted p value: 1; TE change: 2; Gene id: 3;
+                     Keep the order as in count file: 0. [default: 0]
+    -p PLOTS         Make plots to show the data and results. Plots are in pdf
+                     format. On: 1; Off: 0. [default: 0]
+    -q CUTOFFFDR     Set the FDR cutoff for significant case to plot.
+                     [default: 0.1]
+
+Similar to many other RNA-Seq based tools, RiboDiff uses negative binomial distribution to 
+model the read count, which handles larger variation across samples than Poisson. However, 
+we have observed that the randomness of count data from certain type of samples, such as 
+different individuals, may be extremely large. In this case, limited number of replicates 
+cannot provide a good estimation on dispersion, which ends up with less significant results.
+
