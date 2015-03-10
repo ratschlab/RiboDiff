@@ -1,7 +1,7 @@
 SOFTWARE: RiboDiff
 ----------
 
-###VERSION:
+###VERSION
 
 0.1
 
@@ -55,4 +55,5 @@ RiboDiff is licensed under the GPL version 3 or any later version
 
 If you use RiboDiff in your research you are kindly asked to cite the
 following publication:
+
 XXX
