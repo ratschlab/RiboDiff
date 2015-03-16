@@ -11,7 +11,7 @@ Details:
 
 import sys
 import os
-from parseopts import *
+from ribodiff.parseopts import *
 
 def main():
     """
@@ -21,12 +21,12 @@ def main():
     opts = parse_options(sys.argv)
 
     import numpy as np
-    import loadinput as ld
-    import normalize as nm
-    import estimatedisp as ed
-    import testcnt as tc
-    import writeres as wr
-    import plot as pl
+    import ribodiff.loadinput as ld
+    import ribodiff.normalize as nm
+    import ribodiff.estimatedisp as ed
+    import ribodiff.testcnt as tc
+    import ribodiff.writeres as wr
+    import ribodiff.plot as pl
 
     print '*'*25
     FileIn = ld.LoadInputs(opts)
