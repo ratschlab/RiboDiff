@@ -1,30 +1,20 @@
 <tool id="ribodiff" name="RiboDiff" version="0.1">
   <description>Detect Protein Translational Efficiency Difference</description>
   <command interpreter="bash"> 
-    ./../src/
+    scripts/TE.py 
 
-    $anno_file
-    $ribo_diff_out
-    $ribo_diff_out.extra_files_path
-
-#for $i in $groups
-#for $j in $i.replicates
-$j.bam_alignment:#slurp
-#end for
-
-#end for
     >> $Log_File </command>
   <inputs>
 
    <!-- TODO read count table file -->
-	<param format="txt" name="" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
+	<param format="txt" name="count_table" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
 
    <!-- experiment details file  -->
-	<param format="csv" name="" type="data" label="Experiment details" help="This can guide to infer the read count file."/>
+	<param format="csv" name="exp_design" type="data" label="Experiment details" help="This can guide to infer the read count file."/>
 
-    <!--default 0,1 -->
-    <param name="dispersion" default="0">
-
+    <!--default 0,1
+    <param name="dispersion" default="0"/>
+ -->
     
     <!--default 0,1 option to create plots -->
 
@@ -79,6 +69,8 @@ should be cited as [1]_.
 For more information see 
 
 **experiment outline file format** 
+
+    9. attributes - All lines with the same group are linked together into a single item.
 
 The format specification and the description of SAMtools can be found on http://
 
