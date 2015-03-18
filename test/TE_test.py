@@ -27,3 +27,4 @@ try:
 
 except Exception, e:
     print "Error running test cases.\n%s" % str(e) 
+    sys.exit(0)
