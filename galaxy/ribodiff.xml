@@ -1,5 +1,5 @@
 <tool id="ribodiff" name="RiboDiff" version="0.1">
-  <description>Detect Protein Translational Efficiency Difference</description>
+  <description>Detect protein translational efficiency difference</description>
   <command interpreter="bash"> 
     scripts/TE.py 
 
