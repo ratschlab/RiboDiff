@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Installation scripts based on these:
 http://www.scotttorborg.com/python-packaging/minimal.html
@@ -15,7 +14,7 @@ def readme():
 
 setup(name='RiboDiff',
       version='0.1',
-      description='Ribosome foot printing...',
+      description='Detect protein translational efficiency difference using deep sequencing data',
       long_description=readme(),
       keywords='ribo-seq rna-seq differential-expression-testing translational-efficiency',
       url='http://galaxy.cbio.mskcc.org',
@@ -25,5 +24,5 @@ setup(name='RiboDiff',
       packages=['ribodiff'],
       package_dir={'ribodiff': 'src/ribodiff'},
       install_requires=['numpy', 'scipy', 'statsmodels', 'matplotlib'],
-      test_suite="test",
+      test_suite="tests",
       zip_safe=False)
