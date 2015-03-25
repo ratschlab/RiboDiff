@@ -1,8 +1,9 @@
 #!/usr/bin/env python 
 """
-test run script 
+the script integrated with setuptools test command
 
-python setup.py test  
+to execute this script: 
+    python setup.py test  
 """
 
 import os 
@@ -14,7 +15,6 @@ class TransEfficiency(unittest.TestCase):
 
     def testTransEfficiency(self):
         """
-        test function 
         """
 
         setup_file = sys.modules['__main__'].__file__
@@ -29,7 +29,7 @@ class TransEfficiency(unittest.TestCase):
             if returncode != 0:
                 raise Exception, "Exit status return code = %i" % returncode
 
-            print "Test run finished. Please check the results in the %s/tests/ directory." % setup_dir
+            print "Test run finished, results are here %s/tests/" % setup_dir
 
         except Exception, e:
             print "Error running test cases.\n%s" % str(e) 
