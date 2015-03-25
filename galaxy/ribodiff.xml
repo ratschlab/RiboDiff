@@ -1,60 +1,98 @@
 <tool id="ribodiff" name="RiboDiff" version="0.1">
-  <description>Detect protein translational efficiency difference</description>
-  <command interpreter="bash"> 
-    scripts/TE.py 
+    <description>Detect protein translational efficiency difference</description>
+    <requirements>
+        <requirement type="package" version="0.1">RiboDiff</requirement>
+    </requirements>
+    <command interpreter="python"> 
+        <!-- TODO adjusting the command line call  -->
+        scripts/TE.py 
 
-    >> $Log_File </command>
-  <inputs>
+        >> $Log_File 
+    </command>
 
-   <!-- TODO read count table file -->
-	<param format="txt" name="count_table" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
+    <inputs>
+        <!-- read count table file -->
+	    <param format="txt" name="count_table" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
 
-   <!-- experiment details file  -->
-	<param format="csv" name="exp_design" type="data" label="Experiment details" help="This can guide to infer the read count file."/>
+        <!-- experiment details file  -->
+	    <param format="csv" name="exp_design" type="data" label="Experiment outline" help="This can guide to infer the read count file."/>
 
-    <!--default 0,1
-    <param name="dispersion" default="0"/>
- -->
-    
-    <!--default 0,1 option to create plots -->
+        <!--default 0,1 option to create plots -->
+	    <param name="pdf" type="boolean" truevalue="1" falsevalue="0" checked="true" label="Visualizing the analysis report" help="Help to generate additional PDF files with plots."/>
 
-  </inputs>
+		<param name="disp" type="integer" value="0" min="0" label="Dispersion" help="A non negative real number - 0 means the data are same and increases as the data become more diverse." />
 
-  <outputs>
-    <!--default 0,1 option to create plots -->
-    <data format="txt" name="ribo_diff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
-    <data format="txt" name="Log_File" label="${tool.name} on ${on_string}: log"/>
-  </outputs>
+        <!-- TODO more inputs from user -->
 
-  <tests>
-    <test> 
-    <!--TODO-->
-    </test>
-  </tests> 
+    </inputs>
 
-  <help>
+    <outputs>
+        <!-- TODO fixing the result files -->
+        <data format="txt" name="ribo_diff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
+        <data format="txt" name="Log_File" label="${tool.name} on ${on_string}: log"/>
+
+        <data format="pdf" name="plots" label="${tool.name} plots on ${on_string}">
+            <filter>pdf==True</filter>
+        </data>
+    </outputs>
+
+    <tests>
+        <test> 
+            <!--TODO test case for ribodiff-->
+        </test>
+    </tests> 
+
+
+    <help>
 
 .. class:: infomark
 
 **What it does** 
 
-RiboDiff is a tool for detecting protein translational efficiency difference based on RNA-Seq and Ribosome footprinting data.
+RiboDiff_ is a tool for detecting protein translational efficiency difference based on data from high-thoughput deep sequencing assays such as RNA-Seq and Ribosome footprinting.
 
-`RiboDiff` requires:
+**Requires**:
 
-experiment files grouped into replicate groups, each containing several replicates. 
-The program will also work with only two groups containing only a single replicate each. 
-However, this analysis has less statistical power and is therefore not recommended!
+Experiment files grouped into replicate groups, each containing several replicates. The program will also work with only two groups containing only a single replicate each. However, this analysis has less statistical power and is therefore not recommended!
+
+RiboDiff_ takes sequencing read count table generated from htseq-count program. Count table must be generated for each sample (group, replicates) and merged according to the experiment outline file which describes the experiment setup. 
+
+- The following gives example of sequencing read counts from different experiments:: 
+
+    ID	RFcontrolRep1	RFcontrolRep2	RFtreatedRep1	RFtreatedRep2	RNAcontrolRep1	RNAcontrolRep2	RNAcontrolRep3	RNAtreatedRep1	RNAtreatedRep2	RNAtreatedRep3
+    ENSG00000000457	50	24	33	39	3860	4815	3798	2927	4319	3649
+    ENSG00000001461	19	27	21	14	3870	4982	3753	2751	4204	3579
+    ENSG00000001631	106	66	106	56	10912	13989	10613	8415	11724	9840
+    ENSG00000002834	401	319	363	335	40262	52792	38721	28950	42485	35989
+    ENSG00000003402	85	43	51	32	4909	6290	4621	3690	5407	4727
+
+- The corresponding experiment outline file as follows:: 
+
+    Samples,Data_Type,Conditions
+    RFcontrolRep1,Ribo-Seq,Control
+    RFcontrolRep2,Ribo-Seq,Control
+    RFtreatedRep1,Ribo-Seq,Treated
+    RFtreatedRep2,Ribo-Seq,Treated
+    RNAcontrolRep1,RNA-Seq,Control
+    RNAcontrolRep2,RNA-Seq,Control
+    RNAcontrolRep3,RNA-Seq,Control
+    RNAtreatedRep1,RNA-Seq,Treated
+    RNAtreatedRep2,RNA-Seq,Treated
+    RNAtreatedRep3,RNA-Seq,Treated
+
+**Output**:
+
+RiboDiff_ generates a tabular file containing different columns and optional visual plots in PDF format. 
 
 ------
 
 **Reference**
 
-If **RiboDiff** is used to obtain results for scientific publications it
-should be cited as [1]_.
+If **RiboDiff** is used to obtain results for scientific publications it should be cited as [1]_.
 
-.. [1] 
+.. [1] Zhong, Y et.al., (2015): `RiboDiff`_.
 
+.. _RiboDiff: http://bioweb.me/ribo
 
 ------
 
@@ -62,21 +100,21 @@ should be cited as [1]_.
 
 **About formats**
 
-**read count table ** 
+**read count table** 
 
-    9. attributes - All lines with the same group are linked together into a single item.
+For more information see `here`_. 
 
-For more information see 
+.. _here: www-huber.embl.de/users/anders/HTSeq/doc/count.html 
 
 **experiment outline file format** 
 
-    9. attributes - All lines with the same group are linked together into a single item.
-
-The format specification and the description of SAMtools can be found on http://
+The format specification and the description of 
 
 ------
 
+.. _RiboDiff: http://bioweb.me/ribo
+
 RiboDiff Wrapper Version 0.1 (Mar 2015)
 
-</help>
+    </help>
 </tool>
