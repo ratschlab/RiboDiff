@@ -3,8 +3,8 @@
 Command line argument parser.
 """
 
-import sys
 import os
+import sys
 from optparse import OptionParser, OptionGroup
 
 def parse_options(argv):
@@ -49,8 +49,12 @@ def parse_options(argv):
             if not os.path.dirname(opts.__dict__[eachOpt]):
                 opts.__dict__[eachOpt] = os.getcwd() + os.getcwd()[0] + opts.__dict__[eachOpt]
             if not os.path.exists(os.path.dirname(opts.__dict__[eachOpt])):
-                sys.stderr.write('\nError: Path \'%s\' of the output file does not exist.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
-                sys.exit()
+                try:
+                    os.makedirs(os.path.dirname(opts.__dict__[eachOpt]))
+                except OSError:
+                    sys.stderr.write('\nError: Path \'%s\' cannot create directory.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
+                    sys.exit()
+                opts.__dict__['resPath'] = os.path.dirname(opts.__dict__[eachOpt])
             else:
                 opts.__dict__['resPath'] = os.path.dirname(opts.__dict__[eachOpt]) + os.getcwd()[0]
 

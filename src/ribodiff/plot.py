@@ -3,8 +3,8 @@
 Plotting the data and results.
 """
 
-import sys
 import os
+import sys
 import cPickle as pickle
 import numpy as np
 import matplotlib 
@@ -45,8 +45,11 @@ def parse_options(argv):
             if not os.path.dirname(opts.__dict__[eachOpt]):
                 opts.__dict__[eachOpt] = os.getcwd() + os.getcwd()[0] + opts.__dict__[eachOpt]
             if not os.path.exists(os.path.dirname(opts.__dict__[eachOpt])):
-                sys.stderr.write('\nError: Path \'%s\' of the output file does not exist.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
-                sys.exit()
+                try:
+                    os.makedirs(os.path.dirname(opts.__dict__[eachOpt]))
+                except OSError:
+                    sys.stderr.write('\nError: Path \'%s\' cannot create directory.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
+                    sys.exit()
 
     if opts.plotWhich not in ['EmpDisp', 'TE', 'All']:
         parser.error('-p option can only take \'EmpDisp\', \'TE\' or \'All\' as argument.\n')
