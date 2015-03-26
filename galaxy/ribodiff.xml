@@ -1,4 +1,4 @@
-<tool id="ribodiff" name="RiboDiff" version="0.1">
+<tool id="ribodiff" name="RiboDiff" version="0.2">
     <description>Detect protein translational efficiency difference</description>
     <requirements>
         <requirement type="package" version="0.1">RiboDiff</requirement>
@@ -100,21 +100,37 @@ If **RiboDiff** is used to obtain results for scientific publications it should 
 
 **About formats**
 
-**read count table** 
+**Sequencing read count file** gives the count of how many aligned reads map to each genomic feature (defined in genome annotation file) from different samples (tab-seaparated fields)::
+    
+    1. feature_id - The identifier to the genomic feature.
+    2. sample_name - This field indicates the number of reads aligned to the feature from this specific sample. 
+    .
+    .
+    . there will be multiple such fields, depends on the number of samples.
+    .
 
 For more information see `here`_. 
 
 .. _here: www-huber.embl.de/users/anders/HTSeq/doc/count.html 
 
-**experiment outline file format** 
+**Experiment outline file** describes the design of the experiment, the fields are coma-seaparated::
 
-The format specification and the description of 
+    1. sample_name - Unique sample name. 
+    2. data_type - Sequencing experiment data type.
+    3. conditions - Different testing conditions. 
+
+The format specification see `details`_.
+
+.. _details: http://bioweb.me/ribo/faq.html
 
 ------
 
 .. _RiboDiff: http://bioweb.me/ribo
 
-RiboDiff Wrapper Version 0.1 (Mar 2015)
+**Copyright**
 
+RiboDiff Wrapper Version 0.2 (Mar 2015)
+
+2014-2015 Memorial Sloan Kettering Cancer Center &amp; University of Tübingen 
     </help>
 </tool>
