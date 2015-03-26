@@ -6,6 +6,10 @@
     <command interpreter="python"> 
         <!-- TODO adjusting the command line call  -->
         scripts/TE.py 
+        
+        #if $pdf:
+            -p $pdf
+        #end if 
 
         >> $Log_File 
     </command>
@@ -28,7 +32,7 @@
 
     <outputs>
         <!-- TODO fixing the result files -->
-        <data format="txt" name="ribo_diff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
+        <data format="txt" name="ribodiff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
         <data format="txt" name="Log_File" label="${tool.name} on ${on_string}: log"/>
 
         <data format="pdf" name="plots" label="${tool.name} plots on ${on_string}">
