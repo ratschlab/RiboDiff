@@ -51,7 +51,7 @@ All relevant scripts for RiboDiff are located in the subdirectory src.
 
 ###GALAXY
 
-https://galaxy.cbio.mskcc.org
+https://galaxy.cbio.mskcc.org/tool_runner?tool_id=ribodiff
 
 ###DOCUMENTATION
 

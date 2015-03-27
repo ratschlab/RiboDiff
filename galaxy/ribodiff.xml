@@ -5,7 +5,7 @@
     </requirements>
     <command interpreter="python"> 
         <!-- TODO adjusting the command line call  -->
-        /home/vipin/codebase/RiboDiff/scripts/TE.py 
+        RiboDiff/scripts/TE.py 
         -e $exp_design
         -c $count_table
         -d $disp
