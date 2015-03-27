@@ -47,7 +47,6 @@
             <param name="pdf" value="0"/>
             <param name="disp" value="0"/>
             <output name="ribodiff_out" file="ribodiff_out.tab"/>
-            <output name="Log_File" file="ribodiff_log.txt"/>
         </test>
         <!--TODO test case for ribodiff-->
     </tests> 
