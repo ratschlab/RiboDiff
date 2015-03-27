@@ -17,7 +17,7 @@ data in two different experiment conditions.
 
 ###URL
 
-XXX
+http://bioweb.me/ribo
 
 ###REQUIREMENTS
 * Python >= 2.6.6
