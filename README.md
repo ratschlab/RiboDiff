@@ -33,11 +33,12 @@ instructions in INSTALL in this directory.
 
 ###CONTENTS
 
-All relevant scripts for RiboDiff are located in the subdirectory 
-src. And TE.py is the main script to start RiboDiff.
+All relevant scripts for RiboDiff are located in the subdirectory src. 
+
 * src   - main codebase for RiboDiff;
-* test  - dataset and script for functional test;
+* tests  - dataset and script for functional test;
 * tools - util functions for simulating negative binomial count data.
+* scripts - TE.py - the main script to start RiboDiff.
 
 ###GALAXY
 
