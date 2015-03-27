@@ -5,34 +5,34 @@
     </requirements>
     <command interpreter="python"> 
         <!-- TODO adjusting the command line call  -->
-        scripts/TE.py 
-        
+        /home/vipin/codebase/RiboDiff/scripts/TE.py 
+        -e $exp_design
+        -c $count_table
+        -d $disp
+        -o $ribodiff_out 
+
         #if $pdf:
             -p $pdf
-        #end if 
+        #end if
 
         >> $Log_File 
     </command>
 
     <inputs>
-        <!-- read count table file -->
-	    <param format="txt" name="count_table" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
-
+        <!-- read count table file ribodiff_out.extra_files_path-->
+	    <param format="tabular" name="count_table" type="data" label="Sequencing read count file" help="Can be created with BAM files."/>
         <!-- experiment details file  -->
 	    <param format="csv" name="exp_design" type="data" label="Experiment outline" help="This can guide to infer the read count file."/>
-
         <!--default 0,1 option to create plots -->
 	    <param name="pdf" type="boolean" truevalue="1" falsevalue="0" checked="true" label="Visualizing the analysis report" help="Help to generate additional PDF files with plots."/>
-
+        <!--default 0 -->
 		<param name="disp" type="integer" value="0" min="0" label="Dispersion" help="A non negative real number - 0 means the data are same and increases as the data become more diverse." />
-
         <!-- TODO more inputs from user -->
-
     </inputs>
 
     <outputs>
         <!-- TODO fixing the result files -->
-        <data format="txt" name="ribodiff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
+        <data format="tabular" name="ribodiff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
         <data format="txt" name="Log_File" label="${tool.name} on ${on_string}: log"/>
 
         <data format="pdf" name="plots" label="${tool.name} plots on ${on_string}">
@@ -45,7 +45,6 @@
             <!--TODO test case for ribodiff-->
         </test>
     </tests> 
-
 
     <help>
 
