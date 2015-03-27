@@ -1,0 +1,4 @@
+
+    This sub-directory contains all data for running a functional test in
+    Galaxy framework. You may need to move these test files into the 
+    "test-data" directory of your Galaxy installation.
