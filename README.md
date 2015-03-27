@@ -26,10 +26,19 @@ http://bioweb.me/ribo
 * Statsmodels >= 0.6.0
 * Matplotlib >= 1.3.0 
 
-###GETTING STARTED
+###INSTALLATION
 
-To install RiboDiff and the required software, please follow the
-instructions in INSTALL in this directory.
+For a global install, for which you need root permissions::
+
+    python setup.py build
+    python setup.py test [optional]
+    python setup.py install 
+
+For a local install::
+
+    python setup.py build
+    python setup.py test [optional]
+    python setup.py install --prefix=$HOME
 
 ###CONTENTS
 
