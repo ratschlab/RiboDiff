@@ -9,7 +9,7 @@ from optparse import OptionParser, OptionGroup
 
 def parse_options(argv):
 
-    parser = OptionParser()
+    parser = OptionParser(usage='usage: %prog [options] arguments')
 
     required = OptionGroup(parser, 'REQUIRED')
 
