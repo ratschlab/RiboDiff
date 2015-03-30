@@ -7,13 +7,13 @@ SOFTWARE: RiboDiff
 
 ###Authors
 
-Yi Zhong, Philipp Drewe, Theofanis Karaletsos, Vipin Sreedharan and Gunnar Raetsch.
+Yi Zhong, Theofanis Karaletsos, Philipp Drewe, Vipin Sreedharan and Gunnar Raetsch.
 
 ###DESCRIPTION
 
-RiboDiff is a statistical framework to detect the protein translation 
+RiboDiff is a statistical tool to detect the protein translation 
 efficiency change from ribosome footprint profiling data and RNA-Seq
-data in two different experiment conditions.
+data under two different experiment conditions.
 
 ###URL
 
@@ -67,4 +67,5 @@ RiboDiff is licensed under the GPL version 3 or any later version
 If you use RiboDiff in your research you are kindly asked to cite the
 following publication:
 
-XXX
+Zhong Y, Karaletsos T, Drewe P, et al. RiboDiff: Detecting Changes of Translation Efficiency 
+from Ribosome Footprints. bioRxiv. doi: 10.1101/017111.
