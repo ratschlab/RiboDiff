@@ -1,12 +1,10 @@
 
 TO BE DONE SOON 
 
-1) executing test case for checking the code
+1) adding descriptions to the function defined
 
 2) running through both commandline and ipython console
 
-3) adding descriptions to the function defined
+3) Pylint re-run 
 
-4) Pylint re-run 
-
-5) Galaxy wrapper to be installable on toolshed
+4) Galaxy wrapper to be installable on toolshed
