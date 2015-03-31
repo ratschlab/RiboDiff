@@ -1,0 +1,33 @@
+================
+RiboDiff INSTALL
+================
+
+This document shows how to install RiboDiff on your computer. You can either install
+it globally such that every user can use it, or you can install it to your own directory.
+
+Before install RiboDiff, make sure the required packages are already installed on your 
+computer. Please refer to README.md file for details regarding which packages are required.
+
+For a global install (you need root permissions to do so), go to the package directory and
+execute the following commands:
+
+	python setup.py build
+	python setup.py test (optional step)
+	python setup.py install
+
+Alternatively, for a local install, execute the following commands instead:
+
+	python setup.py build
+	python setup.py test (optional step)
+	python setup.py install --prefix=/PATH/PREFIX
+
+Please replace /PATH/PREFIX with your prefered path where RiboDiff will be installed. 
+Make sure this path exists in your PATHONPATH environment variable. If not, you 
+can edit PATHONPATH in your ~/.bashrc if you are using Linux or ~/.bash_profile if 
+Mac OS X by adding the folowing line:
+
+export PYTHONPATH=/PATH/PREFIX/lib/python2.7/site-packages/:$PYTHONPATH
+
+Then execute the command to finish installation:
+
+	python setup.py install --prefix=/PATH/PREFIX
