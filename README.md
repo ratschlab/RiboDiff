@@ -57,6 +57,13 @@ All relevant scripts for RiboDiff are located in the subdirectory src.
 
 * src   - main codebase for RiboDiff;
 * tests  - dataset and script for functional test;
+* test-data  - test dataset for Galaxy system;
+        (move to your galaxy_root_folder/test-data/)
+        You may need to move the test files into your test-data directory so galaxy can find them. 
+        If you want to run the functional tests example as: 
+
+        sh run_functional_tests.sh -id ribodiff
+
 * tools - util functions for simulating negative binomial count data.
 * scripts - TE.py - the main script to start RiboDiff.
 
