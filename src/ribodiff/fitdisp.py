@@ -23,9 +23,6 @@ def do_fitting(data, obj):
     countMean = np.reshape(countMean, (countMean.size, 1))
     dispRawConv = data.dispRawConv
     dispRawMthd = data.dispRawMthd
-    beta = np.array([0.1, 0.01])
-
-    iter = 5
 
     if obj == 'RR':
         index = np.nonzero(dispRawConv == True)[0]
@@ -37,28 +34,14 @@ def do_fitting(data, obj):
 
     idx = np.logical_and(dispRaw > lowerBound, dispRaw < upperBound).nonzero()[0]
 
-    for i in range(iter):
+    matrix = np.empty((idx.size, 2))
+    matrix.fill(np.nan)
+    matrix[:, 0] = 1 / countMean[idx].flatten()
+    matrix[:, 1] = 1
 
-        matrix = np.empty((idx.size, 2))
-        matrix.fill(np.nan)
-        matrix[:, 0] = 1 / countMean[idx].flatten()
-        matrix[:, 1] = 1
-
-        modGamma = sm.GLM(dispRaw[idx], matrix, family=sm.families.Gamma(sm.families.links.identity))
-        result = modGamma.fit(start_params=beta)
-
-        betaBef = beta
-        beta = result.params
-
-        if sum(np.log(beta / betaBef)**2) < 1e-4:
-            dispFittedConv = True
-            break
-        if i == iter - 1:
-            dispFittedConv = False
-            if obj != 'RR':
-                print 'Fitting dispersion for %s does not converge.' % obj
-            else:
-                print 'Fitting dispersion does not converge.'
+    modGamma = sm.GLM(dispRaw[idx], matrix, family=sm.families.Gamma(sm.families.links.identity))
+    result = modGamma.fit()
+    beta = result.params
 
     dispFitted = dispRaw.copy()
     IDX = ~np.isnan(dispRaw)

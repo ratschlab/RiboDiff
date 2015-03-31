@@ -23,22 +23,26 @@ http://bioweb.me/ribo
 * Python >= 2.6.6
 * Numpy >= 1.8.0
 * Scipy >= 0.13.3
-* Statsmodels >= 0.6.0
+* Statsmodels >= 0.5.0
 * Matplotlib >= 1.3.0 
 
 ###INSTALLATION
 
-For a global install, for which you need root permissions::
+For a global install (you need root permissions to do so):
 
     python setup.py build
-    python setup.py test [optional]
-    python setup.py install 
+    python setup.py test (optional step)
+    python setup.py install
 
-For a local install::
+For a local install:
 
     python setup.py build
-    python setup.py test [optional]
+    python setup.py test (optional step)
     python setup.py install --prefix=$HOME
+
+	Please replace $HOME with your prefered path where RiboDiff will be installed. 
+	Make sure this path is also included in your PATHONPATH Environment variable.
+	You can check PATHONPATH by 
 
 ###CONTENTS
 
@@ -67,5 +71,5 @@ RiboDiff is licensed under the GPL version 3 or any later version
 If you use RiboDiff in your research you are kindly asked to cite the
 following publication:
 
-Zhong Y, Karaletsos T, Drewe P, et al. RiboDiff: Detecting Changes of Translation Efficiency 
-from Ribosome Footprints. bioRxiv. doi: 10.1101/017111.
+Zhong Y, Karaletsos T, Drewe P, et al. RiboDiff: Detecting Changes of Translation 
+Efficiency from Ribosome Footprints. bioRxiv. doi: 10.1101/017111.
