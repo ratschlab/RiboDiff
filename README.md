@@ -25,6 +25,7 @@ http://bioweb.me/ribo
 * Scipy >= 0.13.3
 * Matplotlib >= 1.3.0 
 * Statsmodels >= 0.5.0
+
 These requirements can either be installed individually or as a Python distribution
 that includes all the required packages. Please find more details at
 http://www.scipy.org/install.html
