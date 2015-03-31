@@ -3,8 +3,9 @@ TO BE DONE SOON
 
 1) adding descriptions to the function defined
 
-2) running through both commandline and ipython console
+2) Galaxy wrapper to be installable on toolshed
 
-3) Pylint re-run 
+3) running through both commandline and ipython console
 
-4) Galaxy wrapper to be installable on toolshed
+4) Pylint re-run 
+
