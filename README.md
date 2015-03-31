@@ -32,24 +32,7 @@ http://www.scipy.org/install.html
 
 ###INSTALLATION
 
-For a global install (you need root permissions to do so):
-
-    python setup.py build
-    python setup.py test (optional step)
-    python setup.py install
-
-For a local install:
-
-    python setup.py build
-    python setup.py test (optional step)
-    python setup.py install --prefix=/PATH/PREFIX
-
-Please replace /PATH/PREFIX with your prefered path where RiboDiff will be installed. 
-Make sure this path exists in your PATHONPATH environment variable. If not, you 
-can edit PATHONPATH in your ~/.bashrc if you are using Linux or ~/.bash_profile if 
-Mac OS X by adding the folowing line:
-
-	export PYTHONPATH=/PATH/PREFIX/lib/python2.7/site-packages/:$PYTHONPATH
+To install RiboDiff, please refer to INSTALL file in this directory.
 
 ###CONTENTS
 

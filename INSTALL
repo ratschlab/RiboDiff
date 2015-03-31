@@ -31,3 +31,4 @@ export PYTHONPATH=/PATH/PREFIX/lib/python2.7/site-packages/:$PYTHONPATH
 Then execute the command to finish installation:
 
 	python setup.py install --prefix=/PATH/PREFIX
+
