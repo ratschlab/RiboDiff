@@ -20,11 +20,14 @@ data under two different experiment conditions.
 http://bioweb.me/ribo
 
 ###REQUIREMENTS
-* Python >= 2.6.6
+* Python2 >= 2.6.6
 * Numpy >= 1.8.0
 * Scipy >= 0.13.3
-* Statsmodels >= 0.5.0
 * Matplotlib >= 1.3.0 
+* Statsmodels >= 0.5.0
+These requirements can either be installed individually or as a Python distribution
+that includes all the required packages. Please find more details at
+http://www.scipy.org/install.html
 
 ###INSTALLATION
 
@@ -40,9 +43,11 @@ For a local install:
     python setup.py test (optional step)
     python setup.py install --prefix=$HOME
 
-	Please replace $HOME with your prefered path where RiboDiff will be installed. 
-	Make sure this path is also included in your PATHONPATH Environment variable.
-	You can check PATHONPATH by 
+Please replace $HOME with your prefered path where RiboDiff will be installed. 
+Make sure this path exists in your PATHONPATH environment variable. If not,
+you can edit PATHONPATH in your ~/.bashrc if you are using Linux or 
+~/.bash_profile if Mac OS X by adding the folowing line:
+export PYTHONPATH=/PATH/WHERE/RiboDiff/IS/INSTALLED:$PYTHONPATH
 
 ###CONTENTS
 
