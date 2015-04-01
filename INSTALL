@@ -2,11 +2,11 @@
 RiboDiff INSTALL
 ================
 
-This document shows how to install RiboDiff on your computer. You can either install
-it globally such that every user can use it, or you can install it to your own directory.
-
 Before install RiboDiff, make sure the required packages are already installed on your 
 computer. Please refer to README.md file for details regarding which packages are required.
+
+This document shows how to install RiboDiff on your computer. You can either install
+it globally such that every user can use it, or you can install it to your own directory.
 
 For a global install (you need root permissions to do so), go to the package directory and
 execute the following commands:
@@ -32,3 +32,15 @@ Then execute the command to finish installation:
 
 	python setup.py install --prefix=/PATH/PREFIX
 
+After install RiboDiff, you can run it on a toy data to test if the installation is 
+successful. Simplily execute the XXX script in ./tests directory:
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+To run RiboDiff on data provided, all you need is to execute the TE.py in ./scripts 
+directory:
+	python ./scripts/TE.py -e <exp_outline.txt> -c <cnt_table.txt> -o <result.txt>
+
+You can execute this command from anywhere on your computer by giving the complete path 
+to TE.py. Please find details on how to prepare input data for RiboDiff in MANUAL file 
+in this package.
