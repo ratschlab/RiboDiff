@@ -8,7 +8,7 @@ experimental conditions.
 
 To run RiboDiff, please provide two input files:
 
-1) A comma delimited text file that describes the experimental design. Here is an example:
+1) A comma delimited text file (CSV) that describes the experimental design. Here is an example:
 
 Samples,Data_Type,Conditions
 RbCtlR1,Ribo-Seq,Control
