@@ -19,7 +19,7 @@ def parse_options(argv):
 
     optional = OptionGroup(parser, 'OPTIONAL')
 
-    optional.add_option('-d', action='store', type='int', dest='dispDiff', default=1, help='Allow different dispersions for Ribo-seq and RNA-seq count data. On: 1; Off: 0. [default: 1]')
+    optional.add_option('-d', action='store', type='int', dest='dispDiff', default=0, help='Allow different dispersions for Ribo-seq and RNA-seq count data. Off: 0; On: 1. [default: 0]')
     optional.add_option('-s', action='store', type='int', dest='sumCntCutoff', default=10, help='Set the sum of normalized read count as the threshold to do the test. This option applies for both Ribo-seq and RNA-seq data. [default: 10]')
     optional.add_option('-i', action='store', type='float', dest='dispInitial', default=0.01, help='Set the initial dispersion to start the estimation. [default: 0.01]')
     optional.add_option('-m', action='store', type='string', dest='multiTest', default='BH', help='Method for multiple test correction. Options: BH (Benjamini-Hochberg); Bonferroni. [default: BH]')

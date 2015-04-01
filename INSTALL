@@ -26,7 +26,7 @@ Make sure this path exists in your PATHONPATH environment variable. If not, you
 can edit PATHONPATH in your ~/.bashrc if you are using Linux or ~/.bash_profile if 
 Mac OS X by adding the folowing line:
 
-export PYTHONPATH=/PATH/PREFIX/lib/python2.7/site-packages/:$PYTHONPATH
+	export PYTHONPATH=/PATH/PREFIX/lib/python2.7/site-packages/:$PYTHONPATH
 
 Then execute the command to finish installation:
 
