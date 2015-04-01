@@ -3,3 +3,6 @@ RiboDiff.egg-info/
 build/
 dist/
 src/ribodiff/*.pyc
+tests/*.pyc
+scripts/*.pyc
+tools/*.pyc
