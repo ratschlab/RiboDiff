@@ -22,8 +22,8 @@ Alternatively, for a local install, execute the following commands instead:
 	python setup.py install --user
 
 This will install RiboDiff to a default location in your home directory. This location 
-can vary for different operating systems you are using. You can also install it to other
-location by executing
+can vary for different operating systems. You can also install it to other location by 
+executing:
 
 	python setup.py install --prefix=/PATH/PREFIX
 
