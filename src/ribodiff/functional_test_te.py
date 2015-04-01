@@ -46,20 +46,20 @@ def main():
 
     print '*'*25
     data = ed.estimate_disp(data, opts)
-    print 'Estimate dispersion: Done.'
+    print 'Testing estimate dispersion: Done.'
 
     print '*'*25
     data = tc.test_count(data, opts)
     data = tc.adj_pval(data, opts)
-    print 'Statistical test: Done.'
+    print 'Testing statistical test: Done.'
 
     print '*'*25
     data = tc.cal_TEchange(data)
-    print 'Calculate TE and fold change: Done.'
+    print 'Testing calculate TE and fold change: Done.'
 
     print '*'*25
     wr.write_result(data, opts)
-    print 'Write output file: Done.'
+    print 'Testing write output file: Done.'
 
     print '*'*25
     wr.save_data(data, opts)
@@ -67,18 +67,21 @@ def main():
         os.remove(opts.resPath + 'TmpData.pkl')
     except OSError:
         pass
-    print 'Save data: Done.'
+    print 'Testing save data: Done.'
 
     if opts.plots:
         print '*'*25
         pl.make_plots(data, opts)
-        print 'Make plots: Done.'
+        print 'Testing make plots: Done.'
 
     print '*'*25
 
     try:
-        os.remove(opts.resPath + 'test_result.*.pdf')
-        os.remove(opts.resPath + 'test_result.*.pkl')
+        os.remove(opts.resPath + 'test_result.EmpDisp.hist.pdf')
+        os.remove(opts.resPath + 'test_result.EmpDisp.scatter.pdf')
+        os.remove(opts.resPath + 'test_result.TEchange.hist.pdf')
+        os.remove(opts.resPath + 'test_result.TEchange.scatter.pdf')
+        os.remove(opts.resPath + 'test_result.pkl')
     except OSError:
         pass
 
