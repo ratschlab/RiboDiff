@@ -32,13 +32,12 @@ Then execute the command to finish installation:
 
 	python setup.py install --prefix=/PATH/PREFIX
 
-After install RiboDiff, you can run it on a toy data to test if the installation is 
-successful. Simplily execute the XXX script in ./tests directory:
+After install RiboDiff, you can run it on the toy data provided within this package to test 
+if the installation is successful. Simplily execute the XXX script in ./tests directory:
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-To run RiboDiff on data provided, all you need is to execute the TE.py in ./scripts 
-directory:
+To run RiboDiff on your data, all you need is to execute the TE.py in ./scripts directory:
 	python ./scripts/TE.py -e <exp_outline.txt> -c <cnt_table.txt> -o <result.txt>
 
 You can execute this command from anywhere on your computer by giving the complete path 
