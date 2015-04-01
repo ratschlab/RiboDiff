@@ -76,6 +76,12 @@ def main():
 
     print '*'*25
 
+    try:
+        os.remove(opts.resPath + 'test_result.*.pdf')
+        os.remove(opts.resPath + 'test_result.*.pkl')
+    except OSError:
+        pass
+
 if __name__ == '__main__':
     args = sys.argv
     main()
