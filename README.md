@@ -20,7 +20,7 @@ data under two different experiment conditions.
 http://bioweb.me/ribo
 
 ###REQUIREMENTS
-* Python2 >= 2.6.6
+* Python2 >= 2.6.6 (Python3 is not supported yet.)
 * Numpy >= 1.8.0
 * Scipy >= 0.13.3
 * Matplotlib >= 1.3.0 
