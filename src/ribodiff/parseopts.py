@@ -14,7 +14,7 @@ def parse_options(argv):
     required = OptionGroup(parser, 'REQUIRED')
 
     required.add_option('-e', action='store', type='string', dest='exptOutline', help='Text file describing experiment Outline. Must follow required format, please see the manual.')
-    required.add_option('-c', action='store', type='string', dest='cntFile', help='Text file containing the count data. Header line must be consistant with information in experiment Outline.')
+    required.add_option('-c', action='store', type='string', dest='cntFile', help='Text file containing the count data. Header line must be consistent with information in experiment Outline.')
     required.add_option('-o', action='store', type='string', dest='outFile', help='Tab delimited text file containing the results.')
 
     optional = OptionGroup(parser, 'OPTIONAL')

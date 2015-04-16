@@ -39,13 +39,13 @@ G0004	70		59		71		84		1413		1490		1511		1464		1499		1544
 .....
 .....
 
-In this count file, the sample name in header must agree with that in experimental design 
-file. The columns are tab-separated.
+In this count file, the sample name in header line must agree with that in experimental design 
+file. The columns are tab-separated. Only including protein coding genes may give a better 
+global estimation.
 
-The command to run RiboDiff is
+Assuming you are at the RiboDiff package directory, the command to run RiboDiff is:
 
-******************************
-******************************
+	python ./scripts/TE.py -e <exp_outline.txt> -c <cnt_table.txt> -o <result.txt>
 
 RiboDiff loads the input files and normalizes the raw count of each replicate sample 
 according to its sequencing library size. Then, it estimates the dispersion parameter 
@@ -53,7 +53,7 @@ for each gene using a generalized linear model, assuming that read counts follow
 binomial distribution. Note, users can enable/disable the different dispersion estimation 
 for Ribo-Seq and RNA-Seq separately. Next, RiboDiff performs a statistical test based 
 on the H0 and H1 model fitting. Finally, multiple test correction is performed to generate 
-an adjuste P value for every gene.
+an adjusted P value for every gene.
 
 RiboDiff also calculates the log2 fold change of translational efficiency for all genes.
 In addition, RiboDiff can plot figures to visualize the data and the statistical test 
@@ -85,7 +85,7 @@ Options:
     -e EXPTOUTLINE   Text file describing experiment Outline. Must follow
                      required format, please see the manual.
     -c CNTFILE       Text file containing the count data. Header line must be
-                     consistant with information in experiment Outline.
+                     consistent with information in experiment Outline.
     -o OUTFILE       Tab delimited text file containing the results.
 
   OPTIONAL:
@@ -108,7 +108,7 @@ Options:
 
 Similar to many other RNA-Seq based tools, RiboDiff uses negative binomial distribution to 
 model the read count, which handles larger variation across samples than Poisson. However, 
-we have observed that the randomness of count data from certain type of samples, such as 
-different individuals, may be extremely large. In this case, limited number of replicates 
-cannot provide a good estimation on dispersion, which ends up with less significant results.
+if the randomness of count data from certain types of samples are extremely large, limited 
+number of replicates cannot provide a good estimation on dispersion, which ends up with 
+less significant results.
 
