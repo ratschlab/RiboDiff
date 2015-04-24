@@ -29,11 +29,11 @@ def write_result(data, opts):
         dispAdjRibo = data.dispAdjRibo.astype(str)
         dispAdjRna  = data.dispAdjRna.astype(str)
         outNdarrayUnsorted = np.hstack([geneIDs, dispAdjRibo, dispAdjRna, pval, padj, TEctl, TEtrt, logFoldChangeTE])
-        header = 'geneIDs\tdisperRibo\tdisperRNA\tdisperConv\tpval\tpadj\tTE%s\tTE%s\tlog2FC_TE(%s vs %s)\t' % (nameCondA, nameCondB, nameCondB, nameCondA)
+        header = 'geneIDs\tdisperRibo\tdisperRNA\tpval\tpadj\tTE%s\tTE%s\tlog2FC_TE(%s vs %s)\t' % (nameCondA, nameCondB, nameCondB, nameCondA)
     else:
         dispAdj = data.dispAdj.astype(str)
         outNdarrayUnsorted = np.hstack([geneIDs, dispAdj, pval, padj, TEctl, TEtrt, logFoldChangeTE])
-        header = 'geneIDs\tdisper\tdisperConv\tpval\tpadj\tTE%s\tTE%s\tlog2FC_TE(%s vs %s)\t' % (nameCondA, nameCondB, nameCondB, nameCondA)
+        header = 'geneIDs\tdisper\tpval\tpadj\tTE%s\tTE%s\tlog2FC_TE(%s vs %s)\t' % (nameCondA, nameCondB, nameCondB, nameCondA)
 
     if opts.rankResult == 0:
         outNdarray = outNdarrayUnsorted.copy()
