@@ -37,6 +37,7 @@ def parse_options(argv):
     for eachOpt in mandatories:
         if not opts.__dict__[eachOpt]:
             parser.error('-%s is a required option.\n' % eachOpt[0])
+
         if eachOpt in mandatories[:1] and not os.path.exists(opts.__dict__[eachOpt]):
             sys.stderr.write('\nError: File \'%s\' does not exist.\n\n' % opts.__dict__[eachOpt])
             sys.exit()
@@ -48,7 +49,7 @@ def parse_options(argv):
                 try:
                     os.makedirs(os.path.dirname(opts.__dict__[eachOpt]))
                 except OSError:
-                    sys.stderr.write('\nError: Path \'%s\' cannot create directory.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
+                    sys.stderr.write('\nError: Failed to create directory: \'%s\' \n\n' % os.path.dirname(opts.__dict__[eachOpt]))
                     sys.exit()
 
     if opts.plotWhich not in ['EmpDisp', 'TE', 'All']:
@@ -305,7 +306,10 @@ def make_plots(data, opts):
         outputNamePrefix = opts.outFile
     else:
         pos = opts.outFile.rfind('.')
-        outputNamePrefix = opts.outFile[:pos]
+        if opts.outFile[pos:pos+2] == './':
+            outputNamePrefix = opts.outFile
+        else:
+            outputNamePrefix = opts.outFile[:pos]
 
     fileOutName = outputNamePrefix + '.EmpDisp.scatter.pdf'
     empDisp_scatter(data, fileOutName)

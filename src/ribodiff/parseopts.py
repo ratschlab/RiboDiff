@@ -52,11 +52,10 @@ def parse_options(argv):
                 try:
                     os.makedirs(os.path.dirname(opts.__dict__[eachOpt]))
                 except OSError:
-                    sys.stderr.write('\nError: Path \'%s\' cannot create directory.\n\n' % os.path.dirname(opts.__dict__[eachOpt]))
+                    sys.stderr.write('\nError: Failed to create directory: \'%s\' \n\n' % os.path.dirname(opts.__dict__[eachOpt]))
                     sys.exit()
-                opts.__dict__['resPath'] = os.path.dirname(opts.__dict__[eachOpt])
-            else:
-                opts.__dict__['resPath'] = os.path.dirname(opts.__dict__[eachOpt]) + os.getcwd()[0]
+
+            opts.__dict__['resPath'] = os.path.dirname(opts.__dict__[eachOpt]) + os.getcwd()[0]
 
     if opts.dispDiff not in [0, 1]:
         parser.error('-d option can only take either 0 or 1 as argument.\n')
