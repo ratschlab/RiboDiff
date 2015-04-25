@@ -65,7 +65,10 @@ def save_data(data, opts):
         pklFile = opts.outFile + '.pkl'
     else:
         pos = opts.outFile.rfind('.')
-        outputNamePrefix = opts.outFile[:pos]
+        if opts.outFile[pos:pos+2] == './':
+            outputNamePrefix = opts.outFile
+        else:
+            outputNamePrefix = opts.outFile[:pos]
         pklFile = outputNamePrefix + '.pkl'
     with open(pklFile, 'wb') as FileOut:
         pickle.dump(data, FileOut, pickle.HIGHEST_PROTOCOL)
