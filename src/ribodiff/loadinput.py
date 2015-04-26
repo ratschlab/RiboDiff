@@ -141,10 +141,18 @@ class LoadInputs(object):
 
         countRiboCtl = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRiboCtl)
         countRiboTrt = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRiboTrt)
+        if idxRiboCtl.size == 1:
+            countRiboCtl = countRiboCtl.reshape(countRiboCtl.size, 1)
+        if idxRiboTrt.size == 1:
+            countRiboTrt = countRiboTrt.reshape(countRiboTrt.size, 1)
         self.countRibo = np.hstack([countRiboCtl, countRiboTrt])
 
         countRnaCtl = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRnaCtl)
         countRnaTrt = np.loadtxt(self.fileNameCount, dtype=int, skiprows=1, usecols=idxRnaTrt)
+        if idxRnaCtl.size == 1:
+            countRnaCtl = countRnaCtl.reshape(countRnaCtl.size, 1)
+        if idxRnaTrt.size == 1:
+            countRnaTrt = countRnaTrt.reshape(countRnaTrt.size, 1)
         self.countRna = np.hstack([countRnaCtl, countRnaTrt])
 
         self.idxRibo = np.arange(self.countRibo.shape[1])
