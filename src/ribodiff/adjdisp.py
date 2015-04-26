@@ -161,10 +161,10 @@ def disper_adj(data, opts):
                     j += 1
 
                 except sm.tools.sm_exceptions.PerfectSeparationError:
-                    dispRawRibo[i] = disp[0]
-                    dispRawRna[i] = disp[-1]
-                    dispRawConv[i] = False
-                    dispRawMthd[i] = mthd
+                    dispAdjRibo[i] = disp[0]
+                    dispAdjRna[i] = disp[-1]
+                    dispAdjConv[i] = False
+                    dispAdjMthd[i] = mthd
 
             if optimize_scalar:
 
@@ -194,10 +194,10 @@ def disper_adj(data, opts):
                         else:
                             pass
                     except sm.tools.sm_exceptions.PerfectSeparationError:
-                        dispRawRibo[i] = disp
-                        dispRawRna[i]  = disp
-                        dispRawConv[i] = False
-                        dispRawMthd[i] = 'Bounded'
+                        dispAdjRibo[i] = disp
+                        dispAdjRna[i]  = disp
+                        dispAdjConv[i] = False
+                        dispAdjMthd[i] = 'Bounded'
 
     data.dispAdjRibo = dispAdjRibo
     data.dispAdjRna  = dispAdjRna
@@ -263,8 +263,8 @@ def disper_adj_scalar(data, opts):
                     else:
                         pass
                 except sm.tools.sm_exceptions.PerfectSeparationError:
-                        dispRaw[i] = disp
-                        dispRawConv[i] = False
+                        dispAdj[i] = disp
+                        dispAdjConv[i] = False
 
     data.dispAdj = dispAdj
     data.dispAdjConv = dispAdjConv
