@@ -158,13 +158,13 @@ def disper_adj(data, opts):
                         optimize_scalar = True
                         break
 
-                    j += 1
-
                 except sm.tools.sm_exceptions.PerfectSeparationError:
                     dispAdjRibo[i] = disp[0]
                     dispAdjRna[i] = disp[-1]
                     dispAdjConv[i] = False
                     dispAdjMthd[i] = mthd
+
+                j += 1
 
             if optimize_scalar:
 

@@ -33,6 +33,8 @@ def test_count(data, opts):
     lenSampleRibo = data.idxRibo.size
     lenSampleRna  = data.idxRna.size
 
+    errorCnt = 0
+
     for i in range(num):
         sys.stdout.flush()
 
@@ -59,11 +61,13 @@ def test_count(data, opts):
             result0 = modNB0.fit()
             result1 = modNB1.fit()
         except sm.tools.sm_exceptions.PerfectSeparationError:
-            pass
+            errorCnt += 1
         else:
             pval[i] = 1 - chi2.cdf(result0.deviance - result1.deviance, explanatory1.shape[1] - explanatory0.shape[1])
 
     data.pval = pval
+
+    sys.stdout.write('Warning: Failed to do test: %i genes. P value set to \'nan\'.\n' % errorCnt)
 
     return data
 

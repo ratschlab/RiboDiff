@@ -91,13 +91,13 @@ def disper_raw(data, opts):
                         optimize_scalar = True
                         break
 
-                    j += 1
-
                 except sm.tools.sm_exceptions.PerfectSeparationError:
                     dispRawRibo[i] = disp[0]
                     dispRawRna[i] = disp[-1]
                     dispRawConv[i] = False
                     dispRawMthd[i] = mthd
+
+                j += 1
 
             if optimize_scalar:
 
