@@ -3,7 +3,7 @@ SOFTWARE: RiboDiff
 
 ###VERSION
 
-0.1
+0.2.0
 
 ###Authors
 
@@ -17,7 +17,7 @@ data under two different experiment conditions.
 
 ###URL
 
-http://bioweb.me/ribo
+http://bioweb.me/ribodiff
 
 ###REQUIREMENTS
 * Python2 >= 2.6.6 (Python3 is not supported yet.)
@@ -38,9 +38,9 @@ To install RiboDiff, please refer to INSTALL file in this directory.
 
 All relevant scripts for RiboDiff are located in the subdirectory src. 
 
-* src   - main codebase for RiboDiff;
-* tests  - dataset and script for functional test;
-* test-data  - test dataset for Galaxy system;
+* src - main codebase for RiboDiff;
+* tests - dataset and script for functional test;
+* test-data - test dataset for Galaxy system;
         (move to your galaxy_root_folder/test-data/)
         You may need to move the test files into your test-data directory so galaxy can find them. 
         If you want to run the functional tests example as: 

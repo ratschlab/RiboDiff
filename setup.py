@@ -13,8 +13,8 @@ def readme():
 
 
 setup(name='RiboDiff',
-      version='0.1',
-      description='Detect protein translational efficiency difference using deep sequencing data',
+      version='0.2.0',
+      description='Detect protein translational efficiency difference using deep sequencing data.',
       long_description=readme(),
       keywords='ribo-seq rna-seq differential-expression-testing translational-efficiency',
       url='http://galaxy.cbio.mskcc.org',
