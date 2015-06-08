@@ -41,8 +41,9 @@ def parse_options(argv):
                         'mean count and another half as decreased mean count. For example, 1001 out of 20000 genes showing different fold change, the program will generate 500 showing ' \
                         'increase and 501 showing decrease. [default: no gene showing different]')
     optional.add_option('--diffFile', action='store', type='string', dest='diffFile', help='A text file contains integers 1, 2 or 0 to indicate which entries should be generated with mean ' \
-                        'count UP, DOWN or NO CHANGE. The number of integers should equal to the number of entries. One integer per line in this text file. The program will randomly ' \
-                        'choose which entries to alter their mean counts, if this argument is not given.')
+                        'count UP, DOWN or NO CHANGE. The number of integers should equal to the number of entries. One integer per line in this text file. This argument also accepts an ' \
+                        'previously generated count file by this script and uses the diff information to generate a new count file. The program will randomly choose which entries to ' \
+                        'alter their mean counts, if this argument is not given.')
     optional.add_option('--shapeGamma', action='store', type='float', dest='shapeGamma', default=1.5, help='Assume fold change of mean read count between two conditions follows gamma ' \
                         'distribution. Use this argument to set the shape paramter. [default: 1.5]')
     optional.add_option('--scaleGamma', action='store', type='float', dest='scaleGamma', default=0.5, help='Assume fold change of mean read count between two conditions follows gamma ' \
@@ -118,8 +119,16 @@ def generate_count(options):
             idxUp = random.sample(idx, numDiffUp)
             idxDn = np.setdiff1d(idx, idxUp)
         else:
-            diffInfo = np.loadtxt(options.diffFile, dtype=int, skiprows=0, usecols=(0,))
- 
+            with open(options.diffFile, 'r') as DiffFileIn:
+                firstLine = np.array(DiffFileIn.readline().strip().split('\t'), dtype=str)
+            if firstLine.size == 1:
+                diffInfo = np.loadtxt(options.diffFile, dtype=int, skiprows=0, usecols=(0,))
+            elif firstLine[-1] == 'SetAsDiff':
+                diffInfo = np.loadtxt(options.diffFile, dtype=int, skiprows=1, usecols=(-1,))
+            else:
+                sys.stderr.write('\nError: Unexpected file content for [-diffFile] input!\n\n')
+                sys.exit()
+
             idxUp = (diffInfo==2).nonzero()[0]
             idxDn = (diffInfo==1).nonzero()[0]
 
@@ -173,7 +182,7 @@ def generate_count(options):
 
             countString = '\t'.join(str(element) for element in countList)
 
-            if not options.numDiff:
+            if (not options.numDiff) and (not options.diffFile):
                 setAsDiff = '-1'
             elif i in idxUp:
                 setAsDiff = '1'

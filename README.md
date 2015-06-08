@@ -13,7 +13,7 @@ Yi Zhong, Theofanis Karaletsos, Philipp Drewe, Vipin Sreedharan and Gunnar Raets
 
 RiboDiff is a statistical tool to detect the protein translation 
 efficiency change from ribosome footprint profiling data and RNA-Seq
-data under two different experiment conditions.
+data under two different experimental conditions.
 
 ###URL
 
