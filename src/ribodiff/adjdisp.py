@@ -235,6 +235,9 @@ def disper_adj_scalar(data, opts):
     print 'Start to estimate adjusted dispersions.'
 
     num = len(data.geneIDs)
+    muAdj = np.empty((num, data.idxRibo.size + data.idxRna.size))
+    muAdjRibo = np.empty((num, data.idxRibo.size))
+    muAdjRna = np.empty((num, data.idxRna.size))
     dispAdj = np.empty((num, 1))
     dispAdj.fill(np.nan)
     dispAdjConv = dispAdj.copy()
