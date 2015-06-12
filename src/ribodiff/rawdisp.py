@@ -9,6 +9,7 @@ import statsmodels.api as sm
 from scipy.optimize import minimize
 from scipy.optimize import minimize_scalar
 import adjlik as al
+import pdb
 
 def disper_raw(data, opts):
 
@@ -17,6 +18,9 @@ def disper_raw(data, opts):
     print 'Start to estimate raw dispersions.'
 
     num = len(data.geneIDs)
+    muRaw = np.empty((num, data.idxRibo.size + data.idxRna.size))
+    muRawRibo = np.empty((num, data.idxRibo.size))
+    muRawRna  = np.empty((num, data.idxRna.size))
     dispRawRibo = np.empty((num, 1))
     dispRawRibo.fill(np.nan)
     dispRawRna  = dispRawRibo.copy()
@@ -79,12 +83,19 @@ def disper_raw(data, opts):
                             dispRawRna[i]  = disp[-1]
                             dispRawConv[i] = True
                             dispRawMthd[i] = mthd
+                            pdb.set_trace()
+                            muRaw[i, :] = yhat
+                            muRawRibo[i, :] = yhat[data.idxRibo]
+                            muRawRna[i, :] = yhat[data.idxRna]
                             break
                         elif j == 9:
                             dispRawRibo[i] = disp[0]
                             dispRawRna[i] = disp[-1]
                             dispRawConv[i] = False
                             dispRawMthd[i] = mthd
+                            muRaw[i, :] = yhat
+                            muRawRibo[i, :] = yhat[data.idxRibo]
+                            muRawRna[i, :] = yhat[data.idxRna]
                         else:
                             pass
                     else:
@@ -96,6 +107,9 @@ def disper_raw(data, opts):
                     dispRawRna[i] = disp[-1]
                     dispRawConv[i] = False
                     dispRawMthd[i] = mthd
+                    muRaw[i, :] = yhat
+                    muRawRibo[i, :] = yhat[data.idxRibo]
+                    muRawRna[i, :] = yhat[data.idxRna]
 
                 j += 1
 
@@ -117,12 +131,18 @@ def disper_raw(data, opts):
                             dispRawRna[i]  = disp
                             dispRawConv[i] = True
                             dispRawMthd[i] = 'Bounded'
+                            muRaw[i, :] = yhat
+                            muRawRibo[i, :] = yhat[data.idxRibo]
+                            muRawRna[i, :] = yhat[data.idxRna]
                             break
                         elif k == 9:
                             dispRawRibo[i] = disp
                             dispRawRna[i]  = disp
                             dispRawConv[i] = False
                             dispRawMthd[i] = 'Bounded'
+                            muRaw[i, :] = yhat
+                            muRawRibo[i, :] = yhat[data.idxRibo]
+                            muRawRna[i, :] = yhat[data.idxRna]
                         else:
                             pass
                     except sm.tools.sm_exceptions.PerfectSeparationError:
@@ -130,7 +150,13 @@ def disper_raw(data, opts):
                         dispRawRna[i]  = disp
                         dispRawConv[i] = False
                         dispRawMthd[i] = 'Bounded'
+                        muRaw[i, :] = yhat
+                        muRawRibo[i, :] = yhat[data.idxRibo]
+                        muRawRna[i, :] = yhat[data.idxRna]
 
+    data.muRaw     = muRaw
+    data.muRawRibo = muRawRibo
+    data.muRawRna  = muRawRna
     data.dispRawRibo = dispRawRibo
     data.dispRawRna  = dispRawRna
     data.dispRawConv = dispRawConv
@@ -145,6 +171,9 @@ def disper_raw_scalar(data, opts):
     print 'Start to estimate raw dispersions.'
 
     num = len(data.geneIDs)
+    muRaw = np.empty((num, data.idxRibo.size + data.idxRna.size))
+    muRawRibo = np.empty((num, data.idxRibo.size))
+    muRawRna = np.empty((num, data.idxRna.size))
     dispRaw = np.empty((num, 1))
     dispRaw.fill(np.nan)
     dispRawConv = dispRaw.copy()
@@ -181,17 +210,30 @@ def disper_raw_scalar(data, opts):
                     if abs(np.log(disp) - np.log(dispBef)) < 1e-4:
                         dispRaw[i] = disp
                         dispRawConv[i] = True
+                        muRaw[i, :] = yhat
+                        muRawRibo[i, :] = yhat[data.idxRibo]
+                        muRawRna[i, :] = yhat[data.idxRna]
                         break
                     elif k == 9:
                         dispRaw[i] = disp
                         dispRawConv[i] = False
+                        muRaw[i, :] = yhat
+                        muRawRibo[i, :] = yhat[data.idxRibo]
+                        muRawRna[i, :] = yhat[data.idxRna]
                     else:
                         pass
                 except sm.tools.sm_exceptions.PerfectSeparationError:
                         dispRaw[i] = disp
                         dispRawConv[i] = False
+                        muRaw[i, :] = yhat
+                        muRawRibo[i, :] = yhat[data.idxRibo]
+                        muRawRna[i, :] = yhat[data.idxRna]
 
+    data.muRaw     = muRaw
+    data.muRawRibo = muRawRibo
+    data.muRawRna  = muRawRna
     data.dispRaw = dispRaw
     data.dispRawConv = dispRawConv
 
     return data
+

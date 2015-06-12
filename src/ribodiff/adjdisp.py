@@ -72,6 +72,9 @@ def disper_adj(data, opts):
     print 'Start to estimate adjusted dispersions.'
 
     num = len(data.geneIDs)
+    muAdj = np.empty((num, data.idxRibo.size + data.idxRna.size))
+    muAdjRibo = np.empty((num, data.idxRibo.size))
+    muAdjRna  = np.empty((num, data.idxRna.size))
     dispAdjRibo = np.empty((num, 1))
     dispAdjRibo.fill(np.nan)
     dispAdjRna  = dispAdjRibo.copy()
@@ -146,12 +149,18 @@ def disper_adj(data, opts):
                             dispAdjRna[i]  = disp[-1]
                             dispAdjConv[i] = True
                             dispAdjMthd[i] = mthd
+                            muAdj[i, :] = yhat
+                            muAdjRibo[i, :] = yhat[data.idxRibo]
+                            muAdjRna[i, :] = yhat[data.idxRna]
                             break
                         elif j == 9:
                             dispAdjRibo[i] = disp[0]
                             dispAdjRna[i]  = disp[-1]
                             dispAdjConv[i] = False
                             dispAdjMthd[i] = mthd
+                            muAdj[i, :] = yhat
+                            muAdjRibo[i, :] = yhat[data.idxRibo]
+                            muAdjRna[i, :] = yhat[data.idxRna]
                         else:
                             pass
                     else:
@@ -163,6 +172,9 @@ def disper_adj(data, opts):
                     dispAdjRna[i] = disp[-1]
                     dispAdjConv[i] = False
                     dispAdjMthd[i] = mthd
+                    muAdj[i, :] = yhat
+                    muAdjRibo[i, :] = yhat[data.idxRibo]
+                    muAdjRna[i, :] = yhat[data.idxRna]
 
                 j += 1
 
@@ -185,12 +197,18 @@ def disper_adj(data, opts):
                             dispAdjRna[i]  = disp
                             dispAdjConv[i] = True
                             dispAdjMthd[i] = 'Bounded'
+                            muAdj[i, :] = yhat
+                            muAdjRibo[i, :] = yhat[data.idxRibo]
+                            muAdjRna[i, :] = yhat[data.idxRna]
                             break
                         elif k == 9:
                             dispAdjRibo[i] = disp
                             dispAdjRna[i]  = disp
                             dispAdjConv[i] = False
                             dispAdjMthd[i] = 'Bounded'
+                            muAdj[i, :] = yhat
+                            muAdjRibo[i, :] = yhat[data.idxRibo]
+                            muAdjRna[i, :] = yhat[data.idxRna]
                         else:
                             pass
                     except sm.tools.sm_exceptions.PerfectSeparationError:
@@ -198,7 +216,13 @@ def disper_adj(data, opts):
                         dispAdjRna[i]  = disp
                         dispAdjConv[i] = False
                         dispAdjMthd[i] = 'Bounded'
+                        muAdj[i, :] = yhat
+                        muAdjRibo[i, :] = yhat[data.idxRibo]
+                        muAdjRna[i, :] = yhat[data.idxRna]
 
+    data.muAdj     = muAdj
+    data.muAdjRibo = muAdjRibo
+    data.muAdjRna  = muAdjRna
     data.dispAdjRibo = dispAdjRibo
     data.dispAdjRna  = dispAdjRna
     data.dispAdjConv = dispAdjConv
@@ -256,16 +280,28 @@ def disper_adj_scalar(data, opts):
                     if abs(np.log(disp) - np.log(dispBef)) < 1e-4:
                         dispAdj[i] = disp
                         dispAdjConv[i] = True
+                        muAdj[i, :] = yhat
+                        muAdjRibo[i, :] = yhat[data.idxRibo]
+                        muAdjRna[i, :] = yhat[data.idxRna]
                         break
                     elif j == 9:
                         dispAdj[i] = disp
                         dispAdjConv[i] = False
+                        muAdj[i, :] = yhat
+                        muAdjRibo[i, :] = yhat[data.idxRibo]
+                        muAdjRna[i, :] = yhat[data.idxRna]
                     else:
                         pass
                 except sm.tools.sm_exceptions.PerfectSeparationError:
                         dispAdj[i] = disp
                         dispAdjConv[i] = False
+                        muAdj[i, :] = yhat
+                        muAdjRibo[i, :] = yhat[data.idxRibo]
+                        muAdjRna[i, :] = yhat[data.idxRna]
 
+    data.muAdj = muAdj
+    data.muAdjRibo = muAdjRibo
+    data.muAdjRna  = muAdjRna
     data.dispAdj = dispAdj
     data.dispAdjConv = dispAdjConv
 
