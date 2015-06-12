@@ -9,7 +9,6 @@ import statsmodels.api as sm
 from scipy.optimize import minimize
 from scipy.optimize import minimize_scalar
 import adjlik as al
-import pdb
 
 def disper_raw(data, opts):
 
@@ -83,7 +82,6 @@ def disper_raw(data, opts):
                             dispRawRna[i]  = disp[-1]
                             dispRawConv[i] = True
                             dispRawMthd[i] = mthd
-                            pdb.set_trace()
                             muRaw[i, :] = yhat
                             muRawRibo[i, :] = yhat[data.idxRibo]
                             muRawRna[i, :] = yhat[data.idxRna]
