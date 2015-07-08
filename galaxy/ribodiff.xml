@@ -98,9 +98,9 @@ RiboDiff_ generates a tabular file containing different columns and optional vis
 
 If **RiboDiff** is used to obtain results for scientific publications it should be cited as [1]_.
 
-.. [1] Zhong, Y et.al., (2015): `RiboDiff`_.
+.. [1] Zhong, Y et.al. 2015. RiboDiff: Detecting Changes of Translation Efficiency from Ribosome Footprints. bioRxiv `doi:http://dx.doi.org/10.1101/017111`_.
 
-.. _RiboDiff: http://bioweb.me/ribo
+.. _doi:http://dx.doi.org/10.1101/017111: http://dx.doi.org/10.1101/017111
 
 ------
 
