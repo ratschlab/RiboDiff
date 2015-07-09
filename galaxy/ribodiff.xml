@@ -3,9 +3,9 @@
     <requirements>
         <requirement type="package" version="0.1">RiboDiff</requirement>
     </requirements>
-    <command interpreter="python"> 
-        <!-- TODO adjusting the command line call  -->
+    <command interpreter="python"><![CDATA[ 
         RiboDiff/scripts/TE.py 
+
         -e $exp_design
         -c $count_table
         -d $disp
@@ -15,7 +15,7 @@
             -p $pdf
         #end if
 
-        >> $Log_File 
+        >> $Log_File]]>
     </command>
 
     <inputs>
