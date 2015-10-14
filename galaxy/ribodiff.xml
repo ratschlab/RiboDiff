@@ -3,9 +3,9 @@
     <requirements>
         <requirement type="package" version="0.1">RiboDiff</requirement>
     </requirements>
-    <command interpreter="python"> 
-        <!-- TODO adjusting the command line call  -->
+    <command interpreter="python"><![CDATA[ 
         RiboDiff/scripts/TE.py 
+
         -e $exp_design
         -c $count_table
         -d $disp
@@ -15,7 +15,7 @@
             -p $pdf
         #end if
 
-        >> $Log_File 
+        >> $Log_File]]>
     </command>
 
     <inputs>
@@ -35,7 +35,10 @@
         <data format="tabular" name="ribodiff_out" label="${tool.name} on ${on_string}: Differential Translational Efficiency"/>
         <data format="txt" name="Log_File" label="${tool.name} on ${on_string}: log"/>
 
-        <data format="pdf" name="plots" label="${tool.name} plots on ${on_string}">
+        <data format="pdf" name="hist" label="${tool.name} on ${on_string}: TE foldchange histogram" from_work_dir="${ribodiff_out%.dat}.TEchange.hist.pdf">
+            <filter>pdf==True</filter>
+        </data>
+        <data format="pdf" name="scatter" label="${tool.name} on ${on_string}: TE foldchange scatter plot" from_work_dir="${ribodiff_out%.dat}.TEchange.scatter.pdf">
             <filter>pdf==True</filter>
         </data>
     </outputs>
@@ -98,9 +101,9 @@ RiboDiff_ generates a tabular file containing different columns and optional vis
 
 If **RiboDiff** is used to obtain results for scientific publications it should be cited as [1]_.
 
-.. [1] Zhong, Y et.al., (2015): `RiboDiff`_.
+.. [1] Zhong, Y et.al. 2015. RiboDiff: Detecting Changes of Translation Efficiency from Ribosome Footprints. bioRxiv `doi:http://dx.doi.org/10.1101/017111`_.
 
-.. _RiboDiff: http://bioweb.me/ribo
+.. _doi:http://dx.doi.org/10.1101/017111: http://dx.doi.org/10.1101/017111
 
 ------
 
@@ -119,7 +122,7 @@ If **RiboDiff** is used to obtain results for scientific publications it should 
 
 For more information see `here`_. 
 
-.. _here: www-huber.embl.de/users/anders/HTSeq/doc/count.html 
+.. _here: https://github.com/ratschlab/RiboDiff/blob/master/MANUAL#L32
 
 **Experiment outline file** describes the design of the experiment, the fields are coma-seaparated::
 
@@ -129,7 +132,7 @@ For more information see `here`_.
 
 The format specification see `details`_.
 
-.. _details: http://bioweb.me/ribo/faq.html
+.. _details: https://github.com/ratschlab/RiboDiff/blob/master/MANUAL#L11
 
 ------
 
