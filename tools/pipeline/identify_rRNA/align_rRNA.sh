@@ -2,6 +2,13 @@
 
 set -e
 
+ARGS=4
+if [ $# -ne $ARGS ]
+then
+	echo Usage: `basename $0` \<STAR excutable\> \<rRNA reference\> \<FASTQ\> \<output Dir\>
+	exit
+fi
+
 STAR=$1
 rRNAdb=$2
 fastq=$3

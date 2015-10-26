@@ -2,18 +2,24 @@
 
 set -e
 
+ARGS=5
+if [ $# -ne $ARGS ]
+then
+	echo Usage: `basename $0` \<STAR excutable\> \<genome reference\> \<FASTQ 1\> \<FASTQ 2\> \<output Dir\>
+	exit
+fi
+
 STAR=$1
 genome=$2
 fastq1=$3
 fastq2=$4
-bamDir=$5
-logDir=$6
+outputDir=$5
 
-sample=`basename $Fq1 | sed 's/.fastq.gz//'`
+sample=`basename $fastq1 | sed 's/.fastq.gz//'`
 
-cd $bamDir
+cd $outputDir
 
-if [ ! -f $logDir/$sample.Log.final.out ]
+if [ ! -f $outputDir/$sample.Log.final.out ]
 then
 
 	$STAR --genomeDir $genome --readFilesIn $fastq1 $fastq2 --readFilesCommand zcat --runThreadN 1 --outFilterMultimapNmax 1 --outFilterMultimapScoreRange 0 --outFilterMismatchNmax 3 --alignMatesGapMax 10000 --alignIntronMax 500000 --outFilterMatchNmin 20 --genomeLoad NoSharedMemory --outFileNamePrefix $sample. --seedSearchStartLmax 30
@@ -24,7 +30,6 @@ then
 	rm $sample.Log.progress.out
 	rm $sample.SJ.out.tab
 	rm $sample.Log.out
-	mv $sample.Log.final.out $logDir
 
 	echo $sample: Done!
 

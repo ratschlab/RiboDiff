@@ -49,4 +49,8 @@ def get_rRNA_reads(fileInName, fileOutName):
 
 if __name__ == '__main__':
 
+    if len(sys.argv) != 2:
+        sys.stderr.write('Usage:' + '\n' + 'python get_rRNA_reads.py <input Bam> <output file>' + '\n')
+        sys.exit()
+
     get_rRNA_reads(sys.argv[1], sys.argv[2])
