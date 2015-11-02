@@ -9,9 +9,9 @@ Scripts for preprocessing ribosome footprint and RNA-Seq data.
 
 * identify_rRNA
   * Build your local rRNA reference:
-
-    `generate_rRNA_ref.sh <Path To STAR Excutable>`
-
+    ```
+    generate_rRNA_ref.sh <Path To STAR Excutable>
+    ```
   * Align reads to rRNA reference:
   * Identify rRNA reads:
 
