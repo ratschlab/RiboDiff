@@ -63,7 +63,12 @@ def test_count(data, opts):
         except sm.tools.sm_exceptions.PerfectSeparationError:
             errorCnt += 1
         else:
-            pval[i] = 1 - chi2.cdf(result0.deviance - result1.deviance, explanatory1.shape[1] - explanatory0.shape[1])
+            if not opts.dispDiff:
+                pval[i] = 1 - chi2.cdf(result0.deviance - result1.deviance, explanatory1.shape[1] - explanatory0.shape[1])
+            elif opts.dispDiff:
+                pval[i] = 1 - chi2.cdf(result0.deviance - result1.deviance, (explanatory1.shape[1] - explanatory0.shape[1]) / 2.5)
+            else:
+                pass
 
     data.pval = pval
 
