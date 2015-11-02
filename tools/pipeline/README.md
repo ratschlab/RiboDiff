@@ -33,7 +33,7 @@ to align reads to references.
   * Align RNA-Seq reads:
 
     ```
-	align_RNA.sh <STAR excutable> <Genome Reference> <FASTQ 1> <FASTQ 2> <Output Dir>
+	align_RNA.sh <STAR Excutable> <Genome Reference> <FASTQ 1> <FASTQ 2> <Output Dir>
 	```
 
   * Align ribosome footprint reads:
@@ -64,4 +64,4 @@ to align reads to references.
 	python count_expression.pysam.py -A <Bam file> -a <GTF File> -o <Output Count File> -v -b
 	```
 
-	Note: count_expression.pysam.py requires pysam model installed.
+	Note: count_expression.pysam.py requires pysam module installed.
