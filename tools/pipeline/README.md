@@ -12,7 +12,7 @@ to align reads to references.
   * Build your local rRNA reference:
 
     ```
-    generate_rRNA_ref.sh <Path To STAR Excutable>
+	generate_rRNA_ref.sh <Path To STAR Excutable>
     ```
 
   * Align reads to rRNA reference:
@@ -33,5 +33,35 @@ to align reads to references.
   * Align RNA-Seq reads:
 
     ```
-	align_RNA.sh <STAR excutable> <genome reference> <FASTQ 1> <FASTQ 2> <output Dir>
+	align_RNA.sh <STAR excutable> <Genome Reference> <FASTQ 1> <FASTQ 2> <Output Dir>
 	```
+
+  * Align ribosome footprint reads:
+
+	```
+	align_RF.sh <STAR Excutable> <Genome Reference> <FASTQ> <Output Dir>
+	```
+
+* filter_reads
+  * Filter rRNA read alignments from RNA-Seq Bam:
+
+	```
+	python filtering_RNA.py <Input Bam> <rRNA IDs File>
+	```
+
+  * Filter rRNA read alignments from ribosome footprint Bam:
+
+	```
+	python filtering_RF.py <Input Bam> <rRNA IDs File>
+	```
+
+	Note: the filtered Bam file will be generated in the same directory as the input Bam file.
+
+* count_reads
+  * Count reads for genes given the GTF file containing the gene annotation:
+
+	```
+	python count_expression.pysam.py -A <Bam file> -a <GTF File> -o <Output Count File> -v -b
+	```
+
+	Note: count_expression.pysam.py requires pysam model installed.
