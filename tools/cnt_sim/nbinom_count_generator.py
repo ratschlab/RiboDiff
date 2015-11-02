@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-""" This script generates two groups of negative binomial distributed discrete random variables. The two groups (condition A and condition B) contain equal number of  
-    entries (GENE0001, GENE0002, ... GENE1000, ...), and each entry can have multiple replicates in each condition. The mean of each entry across replicates is negative 
-    binomial distributed as well. By using arguments '--beta1' and '--beta2', users can change the dispersion-mean relationship in order to generate different data set, 
-    for instance, Ribo-Seq and RNA-Seq data. """
+""" This script generates two groups of negative binomial distributed discrete random variables. 
+    The two groups (condition A and condition B) contain equal number of  entries (GENE0001, 
+    GENE0002, ... GENE1000, ...). Each entry can have multiple replicates in each condition. 
+    The mean of each entry across replicates is negative binomial distributed as well. By using 
+    arguments '--lambda1' and '--lambda0', users can change the dispersion-mean relationship in 
+    order to generate different data set, for instance, Ribo-Seq and RNA-Seq data. """
 
 import sys
 import numpy as np
@@ -30,10 +32,10 @@ def parse_options(argv):
                         'This argument is for the n parameter. [default: 1]')
     optional.add_option('--pParamNB', action='store', type='float', dest='pParamNB', default=0.01, help='Assume the mean read count of each entry follows negative binomial distribution. ' \
                         'This argument is for the p parameter. It controls the read count level. For instance, use 0.001 for RNA-Seq, and 0.001~0.01 for Ribo-Seq. [default: 0.01]')
-    optional.add_option('--beta1', action='store', type='float', dest='beta1', default=0.100, help='Assume disper = beta1 / MeanCount + beta2 (beta1 must > 0.0). [default: 0.1]')
-    optional.add_option('--beta2', action='store', type='float', dest='beta2', default=0.001, help='Assume disper = beta1 / MeanCount + beta2 (beta2 must > 0.0). [default: 0.001]')
+    optional.add_option('--lambda1', action='store', type='float', dest='lambda1', default=0.100, help='Assume disper = lambda1 / MeanCount + lambda0 (lambda1 must > 0.0). [default: 0.1]')
+    optional.add_option('--lambda0', action='store', type='float', dest='lambda0', default=0.001, help='Assume disper = lambda1 / MeanCount + lambda0 (lambda0 must > 0.0). [default: 0.001]')
     optional.add_option('--dispFile', action='store', type='string', dest='dispFile', help='A text file contains dispersions from which the read count will be generated for every gene. ' \
-                        'The number of dispersions should equal to the number of entries. One dispersion per line in this text file. If this argument is given, the \'beta1\' and \'beta2\' ' \
+                        'The number of dispersions should equal to the number of entries. One dispersion per line in this text file. If this argument is given, the \'lambda1\' and \'lambda0\' ' \
                         'arguments will not be used.')
     optional.add_option('--addDisperError', action='store', type='float', dest='addDisperError', help='Add standard Gaussian distributed noise to log(dispersion) and use this dispersion ' \
                         'to generate read count. The value of this argument is the standard deviation of the Gaussian distribution. [defualt: no noise]')
@@ -73,8 +75,8 @@ def generate_count(options):
     numSampleConB = options.numSampleConB
     nParamNB = options.nParamNB
     pParamNB = options.pParamNB
-    beta1 = options.beta1
-    beta2 = options.beta2
+    lambda1 = options.lambda1
+    lambda0 = options.lambda0
     output = options.output
 
     # First generate the mean read count for each gene. Assume this mean value follows NB distribution (Observed from real data).
@@ -87,7 +89,7 @@ def generate_count(options):
     # Generate dispersions for all genes.
     if not options.dispFile:
         # Generate dispersions as a function of mean count for all genes.
-        disper = beta1 / mu + beta2
+        disper = lambda1 / mu + lambda0
     else:
         # Load the dispersions to generate the count.
         disper = np.loadtxt(options.dispFile, dtype=float, skiprows=0, usecols=(0,))
@@ -148,9 +150,6 @@ def generate_count(options):
         foldDiffUp = gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffUp)
         foldDiffDn = 1.0 / gamma.rvs(a=shapeParam, scale=scaleParam, loc=1.0, size=numDiffDn)
 
-        # Change the mean count of condition A and condition B without changing the overall mean count across the two conditions.
-        # (MeanCountA + MeanCountB) / 2 = MeanCountOrigin & MeanCountA * FoldChange = MeanCountB
-        # Assume there is a negative correlation between mean count and fold change.
         idxUpMem = np.searchsorted(np.sort(mu[idxUp]), mu[idxUp])
         idxDnMem = np.searchsorted(np.sort(mu[idxDn]), mu[idxDn])
 
