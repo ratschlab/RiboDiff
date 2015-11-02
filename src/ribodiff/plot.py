@@ -160,61 +160,6 @@ def empDisp_scatter(data, fileOutName):
 
     plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
 
-def empDisp_hist(data, fileOutName):
-
-    cntRiboNorm = data.countRibo / data.libSizesRibo
-    cntRnaNorm  = data.countRna  / data.libSizesRna 
-
-    idx = np.logical_and(np.sum(cntRiboNorm, axis=1)/data.libSizesRibo.size > 1, np.sum(cntRnaNorm, axis=1)/data.libSizesRna.size > 1).nonzero()[0]
-
-    cntRiboMean = np.mean(cntRiboNorm[idx], axis=1)
-    cntRnaMean  = np.mean(cntRnaNorm[idx],  axis=1)
-
-    varRibo = np.var(cntRiboNorm[idx], axis=1, ddof=0)
-    varRna  = np.var(cntRnaNorm[idx],  axis=1, ddof=0)
-
-    dispRibo = (varRibo - cntRiboMean) / cntRiboMean ** 2
-    dispRna  = (varRna  - cntRnaMean ) / cntRnaMean  ** 2
-
-    index = np.logical_and(dispRibo > 0, dispRna > 0).nonzero()[0]
-    deltaLogDisps = np.log10(dispRibo[index]) - np.log10(dispRna[index])
-
-    num = index.size
-    meanDelta = np.mean(deltaLogDisps)
-    stdDelta  = np.std(deltaLogDisps, ddof=1)
-
-    fig, ax = plt.subplots()
-
-    minDelta = min(deltaLogDisps)
-    maxDelta = max(deltaLogDisps)
-    lowerBound = np.floor(minDelta)
-    upperBound = np.ceil(maxDelta)
-    winSize = (upperBound - lowerBound) / 40.0
-    ax.hist(deltaLogDisps, np.arange(lowerBound, upperBound, winSize), histtype='bar', align='mid', color='limegreen', rwidth=1.0, linewidth=0.5, edgecolor='white')
-
-    if lowerBound < 0.0 and upperBound > 0.0:
-        ax.set_xlim(lowerBound, upperBound)
-    elif lowerBound >= 0.0:
-        ax.set_xlim(-0.1 * (upperBound - lowerBound), upperBound)
-    elif maxDelta <= 0.0:
-        ax.set_xlim(lowerBound, 0.1 * (upperBound - lowerBound))
-    ymin, ymax = plt.ylim()
-    ax.plot((0, 0), (ymax * 0.02, ymax * 0.98), linestyle='--', color='orange', lw=1)
-
-    ax.get_xaxis().tick_bottom()
-    ax.get_yaxis().tick_left()
-    ax.tick_params(axis='x', labelsize=10)
-    ax.tick_params(axis='y', labelsize=10)
-
-    ax.set_xlabel(r'$log_{10}\kappa_{RF}\,-\,log_{10}\kappa_{RNA}$', fontsize=15)
-    ax.set_title(r'Histogram of Dispersion Difference')
-
-    ax.text(0.86, 0.96, r'$n\,=\,%i$' % num, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
-    ax.text(0.86, 0.92, r'$\mu\,=\,%1.2f$' % meanDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
-    ax.text(0.86, 0.88, r'$\sigma\,=\,%1.2f$' % stdDelta, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes, fontsize=12)
-
-    plt.savefig(fileOutName, format='pdf', bbox_inches='tight')
-
 def cnt_deltaTE_scatter(data, fdr, fileOutName):
 
     cntRiboNorm = data.countRibo / data.libSizesRibo
@@ -314,9 +259,6 @@ def make_plots(data, opts):
     fileOutName = outputNamePrefix + '.EmpDisp.scatter.pdf'
     empDisp_scatter(data, fileOutName)
 
-    fileOutName = outputNamePrefix + '.EmpDisp.hist.pdf'
-    empDisp_hist(data, fileOutName)
-
     if opts.__dict__['cutoffFDR']:
         fdr = opts.cutoffFDR
     else:
@@ -338,9 +280,6 @@ if __name__ == '__main__':
     if opts.plotWhich in ['EmpDisp', 'All']:
         fileOutName = opts.outputPrefix + '.EmpDisp.scatter.pdf'
         empDisp_scatter(data, fileOutName)
-
-        fileOutName = opts.outputPrefix + '.EmpDisp.hist.pdf'
-        empDisp_hist(data, fileOutName)
 
     if opts.plotWhich in ['TE', 'All']:
         fdr = opts.cutoffFDR
