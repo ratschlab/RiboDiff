@@ -7,7 +7,7 @@ SOFTWARE: RiboDiff
 
 ###Authors
 
-Yi Zhong, Theofanis Karaletsos, Philipp Drewe, Vipin Sreedharan and Gunnar Raetsch.
+Yi Zhong, Theofanis Karaletsos, Philipp Drewe, Vipin Sreedharan, David Kuo and Gunnar Raetsch.
 
 ###DESCRIPTION
 
