@@ -44,14 +44,14 @@ if __name__ == '__main__':
         print '*'*25
 
         with open(sys.argv[1], 'r') as FileIn:
-            header = np.array(FileIn.readline().strip().split('\t'))[1:]
+            header = np.array(FileIn.readline().strip().split('\t'))
 
         count = np.loadtxt(sys.argv[1], dtype=int, delimiter='\t', skiprows=1, usecols=range(1, header.size))
-        
+
         print 'Read input files: Done.\n%i Genes.' % count[:, 0].size
         print '*'*25
         libSizes = lib_size(count)
         print 'Library size:'
         np.set_printoptions(precision=3)
-        print header
+        print header[1:]
         print libSizes
