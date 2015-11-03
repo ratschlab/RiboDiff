@@ -5,13 +5,13 @@ Calculating the sequencing library size.
 
 import sys
 import numpy as np
-import loadinput as ld
 
 def usage():
     """
     Help message.
     """
-    sys.stderr.write('Usage:' + '\n' + 'python normalize.py Experiment_Outline_File Count_File' + '\n')
+    sys.stderr.write('Usage:' + '\n' + 'python normalize.py <Count File>' + '\n')
+    sys.stderr.write('Note: please calculate library size for RNA-Seq and ribosome footprint separately!' + '\n')
 
 def lib_size(countNdarray):
     """ Calculating library size.
@@ -38,20 +38,20 @@ def lib_size(countNdarray):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 2:
         usage()
     else:
         print '*'*25
-        FileIn = ld.LoadInputs(sys.argv[1], sys.argv[2])
-        data = FileIn.parse_expt()
-        data = FileIn.read_count()
-        print 'Read input files: Done.\n%i Genes.' % data.geneIDs.size
+
+        with open(sys.argv[1], 'r') as FileIn:
+            header = np.array(FileIn.readline().strip().split('\t'))[1:]
+
+        count = np.loadtxt(sys.argv[1], dtype=int, delimiter='\t', skiprows=1, usecols=range(1, header.size))
+        
+        print 'Read input files: Done.\n%i Genes.' % count[:, 0].size
         print '*'*25
-        data.libSizesRibo = lib_size(data.countRibo)
-        data.libSizesRna  = lib_size(data.countRna)
+        libSizes = lib_size(count)
         print 'Library size:'
         np.set_printoptions(precision=3)
-        print data.experRibo
-        print data.libSizesRibo
-        print data.experRna
-        print data.libSizesRna
+        print header
+        print libSizes
