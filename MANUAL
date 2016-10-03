@@ -110,5 +110,8 @@ Similar to many other RNA-Seq based tools, RiboDiff uses negative binomial distr
 model the read count, which handles larger variation across samples than Poisson. However, 
 if the randomness of count data from certain types of samples are extremely large, limited 
 number of replicates cannot provide a good estimation on dispersion, which ends up with 
-less significant results.
+less significant results. Also, we suggest the users to figure out the correlation between 
+replicates. Removing the outliers of replicates before running RiboDiff is recommended.
+
+
 
